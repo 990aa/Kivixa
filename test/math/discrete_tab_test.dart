@@ -48,7 +48,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Primes & Factors'), findsOneWidget);
-      expect(find.byType(Tab), findsNWidgets(4));
+      expect(find.byType(Tab), findsNWidgets(3));
+      expect(find.text('Combinatorics'), findsNothing);
     });
   });
 }

@@ -8,6 +8,7 @@ import 'package:kivixa/pages/home/math/general_tab.dart';
 import 'package:kivixa/pages/home/math/graphing_tab.dart';
 import 'package:kivixa/pages/home/math/statistics_tab.dart';
 import 'package:kivixa/pages/home/math/tools_tab.dart';
+import 'package:kivixa/services/math/math_service.dart';
 
 /// Main Math page with 7 tabs for different math domains.
 /// Uses native Rust backend via flutter_rust_bridge for high-performance
@@ -21,6 +22,7 @@ class MathPage extends StatefulWidget {
 
 class _MathPageState extends State<MathPage> with TickerProviderStateMixin {
   late final TabController _tabController;
+  late final Future<void> _initialization;
 
   static const _tabs = [
     _MathTab(
@@ -69,6 +71,7 @@ class _MathPageState extends State<MathPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
+    _initialization = MathService.instance.initialize();
   }
 
   @override
@@ -103,18 +106,46 @@ class _MathPageState extends State<MathPage> with TickerProviderStateMixin {
           dividerColor: Colors.transparent,
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          MathGeneralTab(),
-          MathAlgebraTab(),
-          MathCalculusTab(),
-          MathStatisticsTab(),
-          MathDiscreteTab(),
-          MathGraphingTab(),
-          MathFormulaeTab(),
-          MathToolsTab(),
-        ],
+      body: FutureBuilder<void>(
+        future: _initialization,
+        builder: (context, snapshot) {
+          final tabs = TabBarView(
+            controller: _tabController,
+            children: const [
+              MathGeneralTab(),
+              MathAlgebraTab(),
+              MathCalculusTab(),
+              MathStatisticsTab(),
+              MathDiscreteTab(),
+              MathGraphingTab(),
+              MathFormulaeTab(),
+              MathToolsTab(),
+            ],
+          );
+          if (snapshot.connectionState == ConnectionState.done &&
+              !snapshot.hasError) {
+            return tabs;
+          }
+          return Stack(
+            children: [
+              AbsorbPointer(absorbing: true, child: tabs),
+              ColoredBox(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Center(
+                  child: snapshot.hasError
+                      ? Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Text(
+                            'Unable to initialize the math engine.\n${snapshot.error}',
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : const CircularProgressIndicator(),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

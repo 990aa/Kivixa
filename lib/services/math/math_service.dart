@@ -25,6 +25,7 @@ class MathService {
   MathService._();
 
   var _isInitialized = false;
+  Future<void>? _initialization;
 
   /// Check if the math backend is initialized
   bool get isInitialized => _isInitialized;
@@ -35,49 +36,61 @@ class MathService {
       return;
     }
 
-    try {
-      ExternalLibrary? externalLibrary;
-
-      if (Platform.isWindows) {
-        // On Windows, try the local build path
-        final exePath = Platform.resolvedExecutable;
-        final exeDir = File(exePath).parent.path;
-        final dllPath = '$exeDir/kivixa_math.dll';
-
-        if (File(dllPath).existsSync()) {
-          externalLibrary = ExternalLibrary.open(dllPath);
-          debugPrint('MathService: Loading from $dllPath');
-        } else {
-          // Try development path
-          const devDllPath = 'native_math/target/release/kivixa_math.dll';
-          if (File(devDllPath).existsSync()) {
-            externalLibrary = ExternalLibrary.open(devDllPath);
-            debugPrint('MathService: Loading from dev path $devDllPath');
-          }
-        }
-      } else if (Platform.isAndroid) {
-        // Android loads from jniLibs automatically
-        debugPrint('MathService: Using Android default loading');
-      } else if (Platform.isLinux) {
-        final exePath = Platform.resolvedExecutable;
-        final exeDir = File(exePath).parent.path;
-        final soPath = '$exeDir/lib/libkivixa_math.so';
-
-        if (File(soPath).existsSync()) {
-          externalLibrary = ExternalLibrary.open(soPath);
-          debugPrint('MathService: Loading from $soPath');
-        }
-      } else if (Platform.isMacOS || Platform.isIOS) {
-        debugPrint('MathService: Using macOS/iOS default loading');
-      }
-
-      await MathRustLib.init(externalLibrary: externalLibrary);
-      _isInitialized = true;
-      debugPrint('MathService: Initialized successfully');
-    } catch (e) {
-      debugPrint('MathService: Failed to initialize - $e');
-      // Don't rethrow - allow graceful degradation
+    final existingInitialization = _initialization;
+    if (existingInitialization != null) {
+      return existingInitialization;
     }
+
+    final initialization = _initialize();
+    _initialization = initialization;
+    try {
+      await initialization;
+    } finally {
+      if (!_isInitialized && identical(_initialization, initialization)) {
+        _initialization = null;
+      }
+    }
+  }
+
+  Future<void> _initialize() async {
+    ExternalLibrary? externalLibrary;
+
+    if (Platform.isWindows) {
+      // On Windows, try the local build path
+      final exePath = Platform.resolvedExecutable;
+      final exeDir = File(exePath).parent.path;
+      final dllPath = '$exeDir/kivixa_math.dll';
+
+      if (File(dllPath).existsSync()) {
+        externalLibrary = ExternalLibrary.open(dllPath);
+        debugPrint('MathService: Loading from $dllPath');
+      } else {
+        // Try development path
+        const devDllPath = 'native_math/target/release/kivixa_math.dll';
+        if (File(devDllPath).existsSync()) {
+          externalLibrary = ExternalLibrary.open(devDllPath);
+          debugPrint('MathService: Loading from dev path $devDllPath');
+        }
+      }
+    } else if (Platform.isAndroid) {
+      // Android loads from jniLibs automatically
+      debugPrint('MathService: Using Android default loading');
+    } else if (Platform.isLinux) {
+      final exePath = Platform.resolvedExecutable;
+      final exeDir = File(exePath).parent.path;
+      final soPath = '$exeDir/lib/libkivixa_math.so';
+
+      if (File(soPath).existsSync()) {
+        externalLibrary = ExternalLibrary.open(soPath);
+        debugPrint('MathService: Loading from $soPath');
+      }
+    } else if (Platform.isMacOS || Platform.isIOS) {
+      debugPrint('MathService: Using macOS/iOS default loading');
+    }
+
+    await MathRustLib.init(externalLibrary: externalLibrary);
+    _isInitialized = true;
+    debugPrint('MathService: Initialized successfully');
   }
 
   /// Ensure the library is initialized before use
@@ -175,18 +188,6 @@ class MathService {
     return math_api.factorial(n: BigInt.from(n));
   }
 
-  /// Calculate combinations C(n, r)
-  DiscreteResult combinations(int n, int r) {
-    _ensureInitialized();
-    return math_api.combinations(n: BigInt.from(n), r: BigInt.from(r));
-  }
-
-  /// Calculate permutations P(n, r)
-  DiscreteResult permutations(int n, int r) {
-    _ensureInitialized();
-    return math_api.permutations(n: BigInt.from(n), r: BigInt.from(r));
-  }
-
   /// Get prime factors
   DiscreteResult primeFactors(int n) {
     _ensureInitialized();
@@ -215,12 +216,6 @@ class MathService {
   DiscreteResult listDivisors(int n) {
     _ensureInitialized();
     return math_api.listDivisors(n: BigInt.from(n));
-  }
-
-  /// Calculate Catalan number
-  DiscreteResult catalan(int n) {
-    _ensureInitialized();
-    return math_api.catalan(n: BigInt.from(n));
   }
 
   // Statistics

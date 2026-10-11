@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueNom,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1636446782;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1164624636;
 
 // Section: executor
 
@@ -73,24 +73,6 @@ fn wire__crate__api__anova_impl(
         },
     )
 }
-fn wire__crate__api__catalan_impl(
-    n: impl CstDecode<u64>,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartDco {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::DcoCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "catalan",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let api_n = n.cst_decode();
-            transform_result_dco::<_, _, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok(crate::api::catalan(api_n))?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
 fn wire__crate__api__chi_squared_test_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     observed: impl CstDecode<Vec<f64>>,
@@ -119,26 +101,6 @@ fn wire__crate__api__chi_squared_test_impl(
                     .await,
                 )
             }
-        },
-    )
-}
-fn wire__crate__api__combinations_impl(
-    n: impl CstDecode<u64>,
-    r: impl CstDecode<u64>,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartDco {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::DcoCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "combinations",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let api_n = n.cst_decode();
-            let api_r = r.cst_decode();
-            transform_result_dco::<_, _, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok(crate::api::combinations(api_n, api_r))?;
-                Ok(output_ok)
-            })())
         },
     )
 }
@@ -1614,26 +1576,6 @@ fn wire__crate__api__partial_derivative_impl(
                     .await,
                 )
             }
-        },
-    )
-}
-fn wire__crate__api__permutations_impl(
-    n: impl CstDecode<u64>,
-    r: impl CstDecode<u64>,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartDco {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::DcoCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "permutations",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let api_n = n.cst_decode();
-            let api_r = r.cst_decode();
-            transform_result_dco::<_, _, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok(crate::api::permutations(api_n, api_r))?;
-                Ok(output_ok)
-            })())
         },
     )
 }
@@ -4093,13 +4035,6 @@ mod io {
     }
 
     #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_kivixa_wire__crate__api__catalan(
-        n: u64,
-    ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartDco {
-        wire__crate__api__catalan_impl(n)
-    }
-
-    #[unsafe(no_mangle)]
     pub extern "C" fn frbgen_kivixa_wire__crate__api__chi_squared_test(
         port_: i64,
         observed: *mut wire_cst_list_prim_f_64_loose,
@@ -4107,14 +4042,6 @@ mod io {
         alpha: f64,
     ) {
         wire__crate__api__chi_squared_test_impl(port_, observed, expected, alpha)
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_kivixa_wire__crate__api__combinations(
-        n: u64,
-        r: u64,
-    ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartDco {
-        wire__crate__api__combinations_impl(n, r)
     }
 
     #[unsafe(no_mangle)]
@@ -4642,14 +4569,6 @@ mod io {
         order: u32,
     ) {
         wire__crate__api__partial_derivative_impl(port_, expression, variable, point, order)
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_kivixa_wire__crate__api__permutations(
-        n: u64,
-        r: u64,
-    ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartDco {
-        wire__crate__api__permutations_impl(n, r)
     }
 
     #[unsafe(no_mangle)]
@@ -5808,13 +5727,6 @@ mod web {
     }
 
     #[wasm_bindgen]
-    pub fn wire__crate__api__catalan(
-        n: flutter_rust_bridge::for_generated::wasm_bindgen::JsValue,
-    ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartDco {
-        wire__crate__api__catalan_impl(n)
-    }
-
-    #[wasm_bindgen]
     pub fn wire__crate__api__chi_squared_test(
         port_: flutter_rust_bridge::for_generated::MessagePort,
         observed: Box<[f64]>,
@@ -5822,14 +5734,6 @@ mod web {
         alpha: f64,
     ) {
         wire__crate__api__chi_squared_test_impl(port_, observed, expected, alpha)
-    }
-
-    #[wasm_bindgen]
-    pub fn wire__crate__api__combinations(
-        n: flutter_rust_bridge::for_generated::wasm_bindgen::JsValue,
-        r: flutter_rust_bridge::for_generated::wasm_bindgen::JsValue,
-    ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartDco {
-        wire__crate__api__combinations_impl(n, r)
     }
 
     #[wasm_bindgen]
@@ -6357,14 +6261,6 @@ mod web {
         order: u32,
     ) {
         wire__crate__api__partial_derivative_impl(port_, expression, variable, point, order)
-    }
-
-    #[wasm_bindgen]
-    pub fn wire__crate__api__permutations(
-        n: flutter_rust_bridge::for_generated::wasm_bindgen::JsValue,
-        r: flutter_rust_bridge::for_generated::wasm_bindgen::JsValue,
-    ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartDco {
-        wire__crate__api__permutations_impl(n, r)
     }
 
     #[wasm_bindgen]

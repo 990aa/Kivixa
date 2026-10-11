@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:kivixa/services/math/math_service.dart';
 
-/// Discrete Math tab - Number theory, combinatorics, sequences
+/// Discrete Math tab - Number theory and sequences
 class MathDiscreteTab extends StatefulWidget {
   const MathDiscreteTab({super.key});
 
@@ -18,7 +18,7 @@ class _MathDiscreteTabState extends State<MathDiscreteTab>
   @override
   void initState() {
     super.initState();
-    _subTabController = TabController(length: 4, vsync: this);
+    _subTabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -37,7 +37,6 @@ class _MathDiscreteTabState extends State<MathDiscreteTab>
           tabs: const [
             Tab(text: 'Primes & Factors'),
             Tab(text: 'Modular'),
-            Tab(text: 'Combinatorics'),
             Tab(text: 'Sequences'),
           ],
         ),
@@ -53,7 +52,6 @@ class _MathDiscreteTabState extends State<MathDiscreteTab>
                 ],
               ),
               _ModularArithmeticCalculator(),
-              _CombinatoricsCalculator(),
               _SequenceCalculator(),
             ],
           ),
@@ -560,272 +558,6 @@ class _FactorCalculatorState extends State<_FactorCalculator> {
   }
 }
 
-// COMBINATORICS CALCULATOR
-
-class _CombinatoricsCalculator extends StatefulWidget {
-  const _CombinatoricsCalculator();
-
-  @override
-  State<_CombinatoricsCalculator> createState() =>
-      _CombinatoricsCalculatorState();
-}
-
-class _CombinatoricsCalculatorState extends State<_CombinatoricsCalculator> {
-  final _nCtrl = TextEditingController(text: '10');
-  final _rCtrl = TextEditingController(text: '3');
-  final _factorialCtrl = TextEditingController(text: '10');
-  var _result = '';
-  var _factorialResult = '';
-  var _isComputing = false;
-  var _isComputingFactorial = false;
-
-  @override
-  void dispose() {
-    _nCtrl.dispose();
-    _rCtrl.dispose();
-    _factorialCtrl.dispose();
-    super.dispose();
-  }
-
-  BigInt _factorial(int n) {
-    if (n <= 1) return BigInt.one;
-    var result = BigInt.one;
-    for (var i = 2; i <= n; i++) {
-      result *= BigInt.from(i);
-    }
-    return result;
-  }
-
-  BigInt _combination(int n, int r) {
-    if (r > n) return BigInt.zero;
-    if (r == 0 || r == n) return BigInt.one;
-    // C(n,r) = n! / (r! * (n-r)!)
-    // Optimized: C(n,r) = product(n-r+1 to n) / r!
-    r = math.min(r, n - r);
-    var result = BigInt.one;
-    for (var i = 0; i < r; i++) {
-      result = result * BigInt.from(n - i) ~/ BigInt.from(i + 1);
-    }
-    return result;
-  }
-
-  BigInt _permutation(int n, int r) {
-    if (r > n) return BigInt.zero;
-    // P(n,r) = n! / (n-r)!
-    var result = BigInt.one;
-    for (var i = n - r + 1; i <= n; i++) {
-      result *= BigInt.from(i);
-    }
-    return result;
-  }
-
-  Future<void> _compute() async {
-    setState(() {
-      _isComputing = true;
-      _result = '';
-    });
-
-    try {
-      final n = int.parse(_nCtrl.text);
-      final r = int.parse(_rCtrl.text);
-
-      if (n < 0 || r < 0) {
-        setState(() {
-          _result = 'Error: n and r must be non-negative';
-          _isComputing = false;
-        });
-        return;
-      }
-      if (n > 1000) {
-        setState(() {
-          _result = 'Error: n too large (max 1000)';
-          _isComputing = false;
-        });
-        return;
-      }
-
-      final comb = _combination(n, r);
-      final perm = _permutation(n, r);
-
-      setState(() {
-        _result =
-            'C($n,$r) = ${_formatBigInt(comb)}\nP($n,$r) = ${_formatBigInt(perm)}';
-        _isComputing = false;
-      });
-    } catch (e) {
-      setState(() {
-        _result = 'Error: Invalid numbers';
-        _isComputing = false;
-      });
-    }
-  }
-
-  Future<void> _computeFactorial() async {
-    setState(() {
-      _isComputingFactorial = true;
-      _factorialResult = '';
-    });
-
-    try {
-      final n = int.parse(_factorialCtrl.text);
-
-      if (n < 0) {
-        setState(() {
-          _factorialResult = 'Error: n must be non-negative';
-          _isComputingFactorial = false;
-        });
-        return;
-      }
-      if (n > 1000) {
-        setState(() {
-          _factorialResult = 'Error: n too large (max 1000)';
-          _isComputingFactorial = false;
-        });
-        return;
-      }
-
-      final fact = _factorial(n);
-
-      setState(() {
-        _factorialResult = '$n! = ${_formatBigInt(fact)}';
-        _isComputingFactorial = false;
-      });
-    } catch (e) {
-      setState(() {
-        _factorialResult = 'Error: Invalid number';
-        _isComputingFactorial = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Combinations & Permutations',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 16),
-
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _nCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'n (total items)',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: TextField(
-                  controller: _rCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'r (choose)',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              const SizedBox(width: 16),
-              FilledButton(
-                onPressed: _isComputing ? null : _compute,
-                child: _isComputing
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Compute'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          if (_result.isNotEmpty)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _result.startsWith('Error')
-                    ? Theme.of(
-                        context,
-                      ).colorScheme.errorContainer.withValues(alpha: 0.3)
-                    : Theme.of(
-                        context,
-                      ).colorScheme.primaryContainer.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: SelectableText(
-                _result,
-                style: const TextStyle(fontSize: 16, fontFamily: 'monospace'),
-              ),
-            ),
-
-          const Divider(height: 32),
-
-          Text('Factorial', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 16),
-
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _factorialCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'n',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              const SizedBox(width: 16),
-              FilledButton(
-                onPressed: _isComputingFactorial ? null : _computeFactorial,
-                child: _isComputingFactorial
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('n!'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          if (_factorialResult.isNotEmpty)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _factorialResult.startsWith('Error')
-                    ? Theme.of(
-                        context,
-                      ).colorScheme.errorContainer.withValues(alpha: 0.3)
-                    : Theme.of(
-                        context,
-                      ).colorScheme.primaryContainer.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: SelectableText(
-                _factorialResult,
-                style: const TextStyle(fontSize: 16, fontFamily: 'monospace'),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 // SEQUENCE CALCULATOR
 
 class _SequenceCalculator extends StatefulWidget {
@@ -854,17 +586,6 @@ class _SequenceCalculatorState extends State<_SequenceCalculator> {
     final seq = <BigInt>[BigInt.zero, BigInt.one];
     for (var i = 2; i < n; i++) {
       seq.add(seq[i - 1] + seq[i - 2]);
-    }
-    return seq;
-  }
-
-  List<BigInt> _catalan(int n) {
-    if (n <= 0) return [];
-    // C(n) = C(2n, n) / (n + 1)
-    final seq = <BigInt>[BigInt.one];
-    for (var i = 1; i < n; i++) {
-      // C(i) = C(i-1) * 2*(2*i - 1) / (i + 1)
-      seq.add(seq[i - 1] * BigInt.from(2 * (2 * i - 1)) ~/ BigInt.from(i + 1));
     }
     return seq;
   }
@@ -939,8 +660,6 @@ class _SequenceCalculatorState extends State<_SequenceCalculator> {
       switch (_sequence) {
         case 'fibonacci':
           result = _fibonacci(n).map((b) => _formatBigInt(b)).toList();
-        case 'catalan':
-          result = _catalan(n).map((b) => _formatBigInt(b)).toList();
         case 'bell':
           result = _bell(n).map((b) => _formatBigInt(b)).toList();
         case 'euler_totient':
@@ -984,10 +703,6 @@ class _SequenceCalculatorState extends State<_SequenceCalculator> {
             ),
             items: const [
               DropdownMenuItem(value: 'fibonacci', child: Text('Fibonacci')),
-              DropdownMenuItem(
-                value: 'catalan',
-                child: Text('Catalan Numbers'),
-              ),
               DropdownMenuItem(value: 'bell', child: Text('Bell Numbers')),
               DropdownMenuItem(
                 value: 'euler_totient',

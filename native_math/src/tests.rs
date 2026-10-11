@@ -550,27 +550,6 @@ mod discrete_tests {
     }
 
     #[test]
-    fn test_combinations() {
-        // C(5, 2) = 10
-        let result = combinations(5, 2);
-        assert!(result.success);
-        assert_eq!(result.value, 10);
-
-        // C(10, 3) = 120
-        let result = combinations(10, 3);
-        assert!(result.success);
-        assert_eq!(result.value, 120);
-    }
-
-    #[test]
-    fn test_permutations() {
-        // P(5, 2) = 20
-        let result = permutations(5, 2);
-        assert!(result.success);
-        assert_eq!(result.value, 20);
-    }
-
-    #[test]
     fn test_prime_factors() {
         let result = prime_factors(360);
         assert!(result.success);
@@ -595,14 +574,6 @@ mod discrete_tests {
         let result = euler_totient(10);
         assert!(result.success);
         assert_eq!(result.value, 4);
-    }
-
-    #[test]
-    fn test_catalan() {
-        // C_5 = 42
-        let result = catalan(5);
-        assert!(result.success);
-        assert_eq!(result.value, 42);
     }
 
     #[test]

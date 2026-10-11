@@ -7,6 +7,7 @@ import 'package:kivixa/pages/home/math/general_tab.dart';
 import 'package:kivixa/pages/home/math/graphing_tab.dart';
 import 'package:kivixa/pages/home/math/statistics_tab.dart';
 import 'package:kivixa/pages/home/math/tools_tab.dart';
+import 'package:kivixa/services/math/math_service.dart';
 import 'package:kivixa/services/overlay/overlay_controller.dart';
 
 /// Floating math widget that shows in the overlay.
@@ -21,6 +22,7 @@ class FloatingMathWindow extends StatefulWidget {
 class _FloatingMathWindowState extends State<FloatingMathWindow>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  late final Future<void> _initialization;
 
   final _tabs = const [
     Tab(text: 'General'),
@@ -36,6 +38,7 @@ class _FloatingMathWindowState extends State<FloatingMathWindow>
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
+    _initialization = MathService.instance.initialize();
   }
 
   @override
@@ -69,32 +72,45 @@ class _FloatingMathWindowState extends State<FloatingMathWindow>
               icon: Icons.calculate,
               minWidth: 400,
               minHeight: 500,
-              child: Column(
-                children: [
-                  // Tab bar
-                  TabBar(
-                    controller: _tabController,
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    tabs: _tabs,
-                  ),
-                  // Tab content
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: const [
-                        MathGeneralTab(),
-                        MathAlgebraTab(),
-                        MathCalculusTab(),
-                        MathStatisticsTab(),
-                        MathDiscreteTab(),
-                        MathGraphingTab(),
-                        MathToolsTab(),
-                      ],
-                    ),
-                  ),
-                ],
+              child: FutureBuilder<void>(
+                future: _initialization,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Unable to initialize math engine.\n${snapshot.error}',
+                      ),
+                    );
+                  }
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return Column(
+                    children: [
+                      TabBar(
+                        controller: _tabController,
+                        isScrollable: true,
+                        tabAlignment: TabAlignment.start,
+                        tabs: _tabs,
+                      ),
+                      Expanded(
+                        child: TabBarView(
+                          controller: _tabController,
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: const [
+                            MathGeneralTab(),
+                            MathAlgebraTab(),
+                            MathCalculusTab(),
+                            MathStatisticsTab(),
+                            MathDiscreteTab(),
+                            MathGraphingTab(),
+                            MathToolsTab(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],

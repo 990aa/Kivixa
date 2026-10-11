@@ -173,7 +173,27 @@ class _MathGeneralTabState extends State<MathGeneralTab> {
           const SizedBox(height: 12),
           _buildCompactKeypad(colorScheme),
           const SizedBox(height: 16),
-          _buildConstantsSection(colorScheme),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final controls = [
+                Expanded(child: _buildTrigSection(colorScheme)),
+                const SizedBox(width: 8),
+                Expanded(child: _buildConstantsSection(colorScheme)),
+              ];
+              return constraints.maxWidth >= 520
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: controls,
+                    )
+                  : Column(
+                      children: [
+                        _buildTrigSection(colorScheme),
+                        const SizedBox(height: 8),
+                        _buildConstantsSection(colorScheme),
+                      ],
+                    );
+            },
+          ),
           const SizedBox(height: 16),
           _buildConversionSection(colorScheme),
         ],
@@ -239,6 +259,69 @@ class _MathGeneralTabState extends State<MathGeneralTab> {
   }
 
   Widget _buildCompactKeypad(ColorScheme colorScheme) {
+    final buttons = <Widget>[
+      _compactBtn(
+        'ln',
+        () => _insertText('ln('),
+        colorScheme.secondaryContainer,
+      ),
+      _compactBtn(
+        'log',
+        () => _insertText('log('),
+        colorScheme.secondaryContainer,
+      ),
+      _compactBtn(
+        '|x|',
+        () => _insertText('abs('),
+        colorScheme.secondaryContainer,
+      ),
+      _compactBtn(
+        '√',
+        () => _insertText('sqrt('),
+        colorScheme.secondaryContainer,
+      ),
+      _compactBtn(
+        'x²',
+        () => _insertText('^2'),
+        colorScheme.secondaryContainer,
+      ),
+      _compactBtn('xʸ', () => _insertText('^'), colorScheme.secondaryContainer),
+      _compactBtn(
+        'n!',
+        () => _insertText('!'),
+        colorScheme.surfaceContainerHigh,
+      ),
+      _compactBtn(
+        'nPr',
+        () => _insertText('P'),
+        colorScheme.surfaceContainerHigh,
+      ),
+      _compactBtn('7', () => _insertText('7'), null),
+      _compactBtn('8', () => _insertText('8'), null),
+      _compactBtn('9', () => _insertText('9'), null),
+      _compactBtn('÷', () => _insertText('/'), colorScheme.primaryContainer),
+      _compactBtn(
+        'nCr',
+        () => _insertText('C'),
+        colorScheme.surfaceContainerHigh,
+      ),
+      _compactBtn('4', () => _insertText('4'), null),
+      _compactBtn('5', () => _insertText('5'), null),
+      _compactBtn('6', () => _insertText('6'), null),
+      _compactBtn('×', () => _insertText('*'), colorScheme.primaryContainer),
+      _compactBtn('%', () => _insertText('%'), colorScheme.primaryContainer),
+      _compactBtn('1', () => _insertText('1'), null),
+      _compactBtn('2', () => _insertText('2'), null),
+      _compactBtn('3', () => _insertText('3'), null),
+      _compactBtn('-', () => _insertText('-'), colorScheme.primaryContainer),
+      const SizedBox(),
+      _compactBtn('0', () => _insertText('0'), null),
+      _compactBtn('.', () => _insertText('.'), null),
+      _compactBtn('=', _evaluate, colorScheme.primary, colorScheme.onPrimary),
+      _compactBtn('+', () => _insertText('+'), colorScheme.primaryContainer),
+      const SizedBox(),
+    ];
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -263,9 +346,7 @@ class _MathGeneralTabState extends State<MathGeneralTab> {
             const SizedBox(width: 4),
             Expanded(
               child: _compactBtn('Ans', () {
-                if (_result.startsWith('= ')) {
-                  _insertText(_result.substring(2));
-                }
+                if (_result.startsWith('= ')) _insertText(_result.substring(2));
               }, colorScheme.surfaceContainerHigh),
             ),
             const SizedBox(width: 4),
@@ -283,189 +364,14 @@ class _MathGeneralTabState extends State<MathGeneralTab> {
           ],
         ),
         const SizedBox(height: 8),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
-          child: Column(
-            children: [
-              ExpansionTile(
-                tilePadding: EdgeInsets.zero,
-                title: const Text('Trigonometric functions'),
-                children: [
-                  Wrap(
-                    spacing: 4,
-                    runSpacing: 4,
-                    children: [
-                      _compactBtn(
-                        'sin',
-                        () => _insertText('sin('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                      _compactBtn(
-                        'cos',
-                        () => _insertText('cos('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                      _compactBtn(
-                        'tan',
-                        () => _insertText('tan('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                      _compactBtn(
-                        'sec',
-                        () => _insertText('sec('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                      _compactBtn(
-                        'csc',
-                        () => _insertText('csc('),
-                        colorScheme.tertiaryContainer,
-                      ),
-
-                      _compactBtn(
-                        'asin',
-                        () => _insertText('asin('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                      _compactBtn(
-                        'acos',
-                        () => _insertText('acos('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                      _compactBtn(
-                        'atan',
-                        () => _insertText('atan('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                      _compactBtn(
-                        'asec',
-                        () => _insertText('asec('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                      _compactBtn(
-                        'acsc',
-                        () => _insertText('acsc('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                      _compactBtn(
-                        'cot',
-                        () => _insertText('cot('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                      _compactBtn(
-                        'acot',
-                        () => _insertText('acot('),
-                        colorScheme.tertiaryContainer,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 5,
-                childAspectRatio: 2.2,
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
-                children: [
-                  _compactBtn(
-                    'ln',
-                    () => _insertText('ln('),
-                    colorScheme.secondaryContainer,
-                  ),
-                  _compactBtn(
-                    'log',
-                    () => _insertText('log('),
-                    colorScheme.secondaryContainer,
-                  ),
-                  _compactBtn(
-                    '|x|',
-                    () => _insertText('abs('),
-                    colorScheme.secondaryContainer,
-                  ),
-
-                  _compactBtn(
-                    '√',
-                    () => _insertText('sqrt('),
-                    colorScheme.secondaryContainer,
-                  ),
-                  _compactBtn(
-                    'x²',
-                    () => _insertText('^2'),
-                    colorScheme.secondaryContainer,
-                  ),
-                  _compactBtn(
-                    'xʸ',
-                    () => _insertText('^'),
-                    colorScheme.secondaryContainer,
-                  ),
-                  _compactBtn(
-                    'n!',
-                    () => _insertText('!'),
-                    colorScheme.surfaceContainerHigh,
-                  ),
-                  _compactBtn(
-                    'nPr',
-                    () => _insertText('P'),
-                    colorScheme.surfaceContainerHigh,
-                  ),
-
-                  _compactBtn('7', () => _insertText('7'), null),
-                  _compactBtn('8', () => _insertText('8'), null),
-                  _compactBtn('9', () => _insertText('9'), null),
-                  _compactBtn(
-                    '÷',
-                    () => _insertText('/'),
-                    colorScheme.primaryContainer,
-                  ),
-                  _compactBtn(
-                    'nCr',
-                    () => _insertText('C'),
-                    colorScheme.surfaceContainerHigh,
-                  ),
-
-                  _compactBtn('4', () => _insertText('4'), null),
-                  _compactBtn('5', () => _insertText('5'), null),
-                  _compactBtn('6', () => _insertText('6'), null),
-                  _compactBtn(
-                    '×',
-                    () => _insertText('*'),
-                    colorScheme.primaryContainer,
-                  ),
-                  _compactBtn(
-                    '%',
-                    () => _insertText('%'),
-                    colorScheme.primaryContainer,
-                  ),
-
-                  _compactBtn('1', () => _insertText('1'), null),
-                  _compactBtn('2', () => _insertText('2'), null),
-                  _compactBtn('3', () => _insertText('3'), null),
-                  _compactBtn(
-                    '-',
-                    () => _insertText('-'),
-                    colorScheme.primaryContainer,
-                  ),
-                  const SizedBox(), // Empty spacer
-
-                  _compactBtn('0', () => _insertText('0'), null),
-                  _compactBtn('.', () => _insertText('.'), null),
-                  _compactBtn(
-                    '=',
-                    _evaluate,
-                    colorScheme.primary,
-                    colorScheme.onPrimary,
-                  ),
-                  _compactBtn(
-                    '+',
-                    () => _insertText('+'),
-                    colorScheme.primaryContainer,
-                  ),
-                  const SizedBox(), // Empty spacer
-                ],
-              ),
-            ],
-          ),
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 5,
+          childAspectRatio: 4.2,
+          crossAxisSpacing: 4,
+          mainAxisSpacing: 4,
+          children: buttons,
         ),
       ],
     );
@@ -478,22 +384,63 @@ class _MathGeneralTabState extends State<MathGeneralTab> {
     Color? fgColor,
   ]) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      color: bgColor ?? colorScheme.surfaceContainerHigh,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: onPressed,
+    return SizedBox(
+      height: 24,
+      child: Material(
+        color: bgColor ?? colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(8),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: fgColor ?? colorScheme.onSurface,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(8),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: fgColor ?? colorScheme.onSurface,
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTrigSection(ColorScheme colorScheme) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: ExpansionTile(
+        tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+        title: const Text('Trigonometric functions'),
+        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        children: [
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children: [
+              for (final function in const [
+                'sin',
+                'cos',
+                'tan',
+                'sec',
+                'csc',
+                'asin',
+                'acos',
+                'atan',
+                'asec',
+                'acsc',
+                'cot',
+                'acot',
+              ])
+                _compactBtn(
+                  function,
+                  () => _insertText('$function('),
+                  colorScheme.tertiaryContainer,
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

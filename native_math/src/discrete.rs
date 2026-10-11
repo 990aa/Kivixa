@@ -166,38 +166,6 @@ pub fn factorial(n: u64) -> DiscreteResult {
     DiscreteResult::big(result)
 }
 
-/// Combinations C(n, k) = n! / (k! * (n-k)!)
-pub fn combinations(n: u64, k: u64) -> DiscreteResult {
-    if k > n {
-        return DiscreteResult::value(0);
-    }
-
-    // Use smaller k to minimize computation
-    let k = k.min(n - k);
-
-    let mut result = BigUint::one();
-    for i in 0..k {
-        result *= n - i;
-        result /= i + 1;
-    }
-
-    DiscreteResult::big(result)
-}
-
-/// Permutations P(n, k) = n! / (n-k)!
-pub fn permutations(n: u64, k: u64) -> DiscreteResult {
-    if k > n {
-        return DiscreteResult::value(0);
-    }
-
-    let mut result = BigUint::one();
-    for i in 0..k {
-        result *= n - i;
-    }
-
-    DiscreteResult::big(result)
-}
-
 /// Greatest Common Divisor using Euclidean algorithm
 pub fn gcd(a: u64, b: u64) -> u64 {
     if b == 0 {
@@ -467,28 +435,6 @@ pub fn list_divisors(n: u64) -> DiscreteResult {
 /// Check if two numbers are coprime (GCD = 1)
 pub fn are_coprime(a: u64, b: u64) -> DiscreteResult {
     DiscreteResult::bool_val(gcd(a, b) == 1)
-}
-
-/// Binomial coefficient using BigUint
-pub fn binomial(n: u64, k: u64) -> DiscreteResult {
-    combinations(n, k)
-}
-
-/// Catalan number C_n
-pub fn catalan(n: u64) -> DiscreteResult {
-    if n > 1000 {
-        return DiscreteResult::error("Number too large for Catalan");
-    }
-
-    // C_n = C(2n, n) / (n + 1)
-    let mut result = BigUint::one();
-    for i in 0..n {
-        result *= 2 * n - i;
-        result /= i + 1;
-    }
-    result /= n + 1;
-
-    DiscreteResult::big(result)
 }
 
 /// Stirling number of the second kind S(n, k)

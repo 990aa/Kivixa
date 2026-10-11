@@ -10,7 +10,6 @@ abstract class RoutePaths {
   static const home = '$prefixOfHome/:subpage';
   static const edit = '/edit';
   static const markdown = '/markdown';
-  static const textFile = '/textfile';
   static const login = '/login';
   static const logs = '/logs';
   static const splitScreen = '/split-screen';
@@ -35,10 +34,6 @@ abstract class RoutePaths {
 
   static String markdownFilePath(String filePath) {
     return '$markdown?path=${Uri.encodeQueryComponent(filePath)}';
-  }
-
-  static String textFilePath(String filePath) {
-    return '$textFile?path=${Uri.encodeQueryComponent(filePath)}';
   }
 
   static String splitScreenPath({String? leftPath, String? rightPath}) {
@@ -81,14 +76,6 @@ abstract class HomeRoutes {
       icon: const AdaptiveIcon(
         icon: Icons.calendar_month,
         cupertinoIcon: CupertinoIcons.calendar,
-      ),
-    ),
-    _Route(
-      routePath: _homeFunction({'subpage': HomePage.whiteboardSubpage}),
-      label: t.home.tabs.whiteboard,
-      icon: const AdaptiveIcon(
-        icon: Icons.draw,
-        cupertinoIcon: CupertinoIcons.pencil_outline,
       ),
     ),
     _Route(

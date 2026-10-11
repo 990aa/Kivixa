@@ -10,7 +10,7 @@ use llama_cpp_2::context::params::LlamaContextParams;
 use llama_cpp_2::llama_backend::LlamaBackend;
 use llama_cpp_2::llama_batch::LlamaBatch;
 use llama_cpp_2::model::params::LlamaModelParams;
-use llama_cpp_2::model::{AddBos, LlamaChatMessage, LlamaModel};
+use llama_cpp_2::model::{LlamaChatMessage, LlamaModel};
 use llama_cpp_2::sampling::LlamaSampler;
 use llama_cpp_2::token::data_array::LlamaTokenDataArray;
 use llama_cpp_2::token::LlamaToken;
@@ -369,10 +369,7 @@ fn generate_text_with_options(
         .map_err(|e| anyhow!("Failed to create context: {:?}", e))?;
 
     // Tokenize the prompt
-    let tokens = state
-        .model
-        .str_to_token(&prompt, AddBos::Always)
-        .map_err(|e| anyhow!("Failed to tokenize: {:?}", e))?;
+    let tokens = state.model.vocab().tokenize(prompt.as_bytes(), true, true);
 
     log::debug!("Prompt tokenized to {} tokens", tokens.len());
 
@@ -401,7 +398,7 @@ fn generate_text_with_options(
         let new_token = sampler.sample(&ctx, batch.n_tokens() - 1);
 
         // Check for end of generation
-        if state.model.is_eog_token(new_token) {
+        if state.model.vocab().is_eog(new_token) {
             break;
         }
 
@@ -446,10 +443,7 @@ pub fn get_embedding(text: String) -> Result<Vec<f32>> {
         .map_err(|e| anyhow!("Failed to create embedding context: {:?}", e))?;
 
     // Tokenize input
-    let tokens = state
-        .model
-        .str_to_token(&text, AddBos::Always)
-        .map_err(|e| anyhow!("Failed to tokenize: {:?}", e))?;
+    let tokens = state.model.vocab().tokenize(text.as_bytes(), true, true);
 
     // Create batch with all tokens
     let mut batch = LlamaBatch::new(2048, 1);
@@ -664,8 +658,9 @@ fn chat_completion_with_vision(
             .new_context(&state.backend, ctx_params)
             .map_err(|e| anyhow!("Failed to create context for vision inference: {:?}", e))?;
 
-        let mtmd_ctx = MtmdContext::init_from_file(mmproj_path, &state.model, &Default::default())
-            .map_err(|e| anyhow!("Failed to initialize mtmd context: {}", e))?;
+        let mut mtmd_ctx =
+            MtmdContext::init_from_file(mmproj_path, &state.model, &Default::default())
+                .map_err(|e| anyhow!("Failed to initialize mtmd context: {}", e))?;
 
         if !mtmd_ctx.support_vision() {
             return Err(anyhow!("Loaded mtmd context does not support vision"));
@@ -685,7 +680,14 @@ fn chat_completion_with_vision(
             .map_err(|e| anyhow!("Failed to tokenize multimodal prompt: {}", e))?;
 
         let n_past = chunks
-            .eval_chunks(&mtmd_ctx, &ctx, 0, 0, state.config.n_ctx as i32, true)
+            .eval_chunks(
+                &mut mtmd_ctx,
+                &mut ctx,
+                0,
+                0,
+                state.config.n_ctx as i32,
+                true,
+            )
             .map_err(|e| anyhow!("Failed to evaluate multimodal chunks: {}", e))?;
 
         generate_from_context(state, &mut ctx, max_tokens, n_past.max(0) as usize)
@@ -714,7 +716,7 @@ fn generate_from_context(
         rng_seed = rng_seed.wrapping_mul(1103515245).wrapping_add(12345);
         let new_token = candidates_array.sample_token(rng_seed);
 
-        if state.model.is_eog_token(new_token) {
+        if state.model.vocab().is_eog(new_token) {
             break;
         }
 
@@ -736,14 +738,7 @@ fn generate_from_context(
 fn detokenize_tokens(model: &LlamaModel, tokens: &[LlamaToken]) -> Result<String> {
     let mut all_bytes = Vec::new();
     for token in tokens {
-        let bytes = match model.token_to_piece_bytes(*token, 8, true, None) {
-            Err(llama_cpp_2::TokenToStringError::InsufficientBufferSpace(i)) => {
-                let size = usize::try_from(-i).unwrap_or(32);
-                model.token_to_piece_bytes(*token, size, true, None)
-            }
-            x => x,
-        }
-        .map_err(|e| anyhow!("Failed to detokenize token: {:?}", e))?;
+        let bytes = model.vocab().token_to_piece(*token, true, None);
         all_bytes.extend_from_slice(&bytes);
     }
     Ok(String::from_utf8_lossy(&all_bytes).into_owned())

@@ -785,7 +785,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [0.10.1] - 2026-10-01
 
-### Fixed
-- Fix markdown notes interface
+### Changes
+
+- **Arbitrary derivative order**
+  - Replaced the 1st/2nd/3rd derivative selector with a typed order field.
+  - Added validation for non-negative orders.
+  - Results now come from the Rust backend with explicit error handling.
+
+- **Arbitrary partial derivative order**
+  - Replaced the capped selector with a typed order field.
+  - Removed the inaccurate Flutter-side numerical implementation.
+  - Partial derivatives now use the Rust backend.
+
+- **Taylor/Maclaurin series**
+  - Replaced the 2–10 term slider with a typed number-of-terms field.
+  - Rust factorial handling now uses `f64`, avoiding integer overflow for larger term counts.
+
+- **Multiple integrals**
+  - Double and triple integral calculations now use the Rust backend instead of duplicate Flutter calculations.
+  - Backend errors are surfaced to the UI.
+
+- **Matrix dimensions**
+  - Added directly editable `Rows` and `Columns` fields.
+  - Existing matrix values are preserved when resizing.
+  - Dimension input is bounded to safe values from 1 to 50.
+
+- **Primes and factors**
+  - Merged the two tabs into a combined **Primes & Factors** tab.
+
+- **General calculator**
+  - Grouped trigonometric and inverse-trigonometric functions inside an expandable section.
+  - Limited calculator width to prevent oversized Windows buttons.
+  - Reduced button aspect ratio so controls remain compact.
 
 ---

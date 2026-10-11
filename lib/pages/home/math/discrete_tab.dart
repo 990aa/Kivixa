@@ -18,7 +18,7 @@ class _MathDiscreteTabState extends State<MathDiscreteTab>
   @override
   void initState() {
     super.initState();
-    _subTabController = TabController(length: 5, vsync: this);
+    _subTabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -35,8 +35,7 @@ class _MathDiscreteTabState extends State<MathDiscreteTab>
           controller: _subTabController,
           isScrollable: true,
           tabs: const [
-            Tab(text: 'Primes'),
-            Tab(text: 'Factors'),
+            Tab(text: 'Primes & Factors'),
             Tab(text: 'Modular'),
             Tab(text: 'Combinatorics'),
             Tab(text: 'Sequences'),
@@ -46,8 +45,13 @@ class _MathDiscreteTabState extends State<MathDiscreteTab>
           child: TabBarView(
             controller: _subTabController,
             children: const [
-              _PrimeCalculator(),
-              _FactorCalculator(),
+              Column(
+                children: [
+                  Expanded(child: _PrimeCalculator()),
+                  Divider(height: 1),
+                  Expanded(child: _FactorCalculator()),
+                ],
+              ),
               _ModularArithmeticCalculator(),
               _CombinatoricsCalculator(),
               _SequenceCalculator(),

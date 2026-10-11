@@ -217,7 +217,7 @@ class _AdvancedMarkdownEditorState extends State<AdvancedMarkdownEditor>
   }
 
   String _filePathWithoutMarkdownExtension(String filePath) {
-    final extension = AdvancedMarkdownEditor.extension;
+    const extension = AdvancedMarkdownEditor.extension;
     return filePath.toLowerCase().endsWith(extension)
         ? filePath.substring(0, filePath.length - extension.length)
         : filePath;

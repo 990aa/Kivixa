@@ -220,6 +220,14 @@ mod calculus_tests {
     }
 
     #[test]
+    fn test_differentiate_arbitrary_order() {
+        // d⁴/dx⁴(x⁴) = 24 at every point.
+        let result = differentiate("x^4", "x", 2.0, 4);
+        assert!(result.success);
+        assert!((result.value - 24.0).abs() < 0.5);
+    }
+
+    #[test]
     fn test_integrate() {
         // ∫₀¹ x² dx = 1/3
         let result = integrate("x^2", "x", 0.0, 1.0, 100);
@@ -272,6 +280,23 @@ mod calculus_tests {
         let result = partial_derivative("x^2 + y^2", "y", point, 1);
         assert!(result.success);
         assert!((result.value - 4.0).abs() < 1e-4);
+    }
+
+    #[test]
+    fn test_partial_derivative_arbitrary_order() {
+        // ∂³/∂x³(x⁵ + y) at x=2 is 60x² = 240.
+        let point = vec![("x", 2.0), ("y", 3.0)];
+        let result = partial_derivative("x^5 + y", "x", point, 3);
+        assert!(result.success);
+        assert!((result.value - 240.0).abs() < 5.0);
+    }
+
+    #[test]
+    fn test_taylor_coefficients_more_than_ten_terms() {
+        let coefficients = taylor_coefficients("x^2", "x", 0.0, 16);
+        assert_eq!(coefficients.len(), 16);
+        assert!(coefficients[0].abs() < 1e-6);
+        assert!((coefficients[2] - 1.0).abs() < 0.1);
     }
 
     #[test]

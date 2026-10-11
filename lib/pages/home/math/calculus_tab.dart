@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:kivixa/services/math/math_service.dart';
 
@@ -61,95 +59,6 @@ class _MathCalculusTabState extends State<MathCalculusTab>
   }
 }
 
-String _processFunctions(String expr) {
-  var changed = true;
-  var iterations = 0;
-  while (changed && iterations < 50) {
-    changed = false;
-    iterations++;
-
-    for (final fn in ['sqrt', 'sin', 'cos', 'tan', 'ln', 'log', 'abs', 'exp']) {
-      final match = RegExp('$fn\\(([^()]+)\\)').firstMatch(expr);
-      if (match != null) {
-        final inner = _calculate(match.group(1)!);
-        double result;
-        switch (fn) {
-          case 'sqrt':
-            result = math.sqrt(inner);
-          case 'sin':
-            result = math.sin(inner);
-          case 'cos':
-            result = math.cos(inner);
-          case 'tan':
-            result = math.tan(inner);
-          case 'ln':
-            result = math.log(inner);
-          case 'log':
-            result = math.log(inner) / math.ln10;
-          case 'abs':
-            result = inner.abs();
-          case 'exp':
-            result = math.exp(inner);
-          default:
-            result = inner;
-        }
-        expr = expr.replaceFirst(match.group(0)!, '($result)');
-        changed = true;
-        break;
-      }
-    }
-  }
-  return expr;
-}
-
-double _calculate(String expr) {
-  expr = expr.trim();
-
-  // Handle parentheses
-  while (expr.contains('(')) {
-    final match = RegExp(r'\(([^()]+)\)').firstMatch(expr);
-    if (match == null) break;
-    final inner = _calculate(match.group(1)!);
-    expr = expr.replaceFirst(match.group(0)!, inner.toString());
-  }
-
-  // Handle power (^)
-  final powerIdx = expr.lastIndexOf('^');
-  if (powerIdx > 0) {
-    final base = _calculate(expr.substring(0, powerIdx));
-    final exp = _calculate(expr.substring(powerIdx + 1));
-    return math.pow(base, exp).toDouble();
-  }
-
-  // Handle +/- (right to left)
-  for (var i = expr.length - 1; i >= 0; i--) {
-    if ((expr[i] == '+' || expr[i] == '-') && i > 0) {
-      if (i > 0 && (expr[i - 1] == 'e' || expr[i - 1] == 'E')) continue;
-      final left = expr.substring(0, i);
-      final right = expr.substring(i + 1);
-      if (left.isNotEmpty && right.isNotEmpty) {
-        return expr[i] == '+'
-            ? _calculate(left) + _calculate(right)
-            : _calculate(left) - _calculate(right);
-      }
-    }
-  }
-
-  // Handle */
-  for (var i = expr.length - 1; i >= 0; i--) {
-    if (expr[i] == '*' || expr[i] == '/') {
-      final left = expr.substring(0, i);
-      final right = expr.substring(i + 1);
-      if (left.isNotEmpty && right.isNotEmpty) {
-        final r = _calculate(right);
-        return expr[i] == '*' ? _calculate(left) * r : _calculate(left) / r;
-      }
-    }
-  }
-
-  return double.parse(expr);
-}
-
 String _formatNumber(double n) {
   if (n.isNaN) return 'undefined';
   if (n.isInfinite) return n > 0 ? '∞' : '-∞';
@@ -173,7 +82,7 @@ class _DerivativeCalculatorState extends State<_DerivativeCalculator> {
   final _expressionCtrl = TextEditingController(text: 'x^2 + 3*x + 2');
   final _variableCtrl = TextEditingController(text: 'x');
   final _pointCtrl = TextEditingController(text: '1');
-  var _order = 1;
+  final _orderCtrl = TextEditingController(text: '1');
   var _result = '';
   var _isComputing = false;
 
@@ -182,6 +91,7 @@ class _DerivativeCalculatorState extends State<_DerivativeCalculator> {
     _expressionCtrl.dispose();
     _variableCtrl.dispose();
     _pointCtrl.dispose();
+    _orderCtrl.dispose();
     super.dispose();
   }
 
@@ -196,15 +106,22 @@ class _DerivativeCalculatorState extends State<_DerivativeCalculator> {
       final variable = _variableCtrl.text;
       final point = double.parse(_pointCtrl.text);
 
-      // Use Rust backend for computation
+      final order = int.parse(_orderCtrl.text);
+      if (order < 0) {
+        throw const FormatException('Derivative order must be non-negative');
+      }
+
       final result = await MathService.instance.differentiate(
         expr,
         variable,
         point,
-        order: _order,
+        order: order,
       );
+      if (!result.success) {
+        throw Exception(result.error ?? 'Derivative failed');
+      }
 
-      final primeSymbol = "'" * _order;
+      final primeSymbol = "'" * order;
       setState(() {
         _result = 'f$primeSymbol($point) = ${_formatNumber(result.value)}';
         _isComputing = false;
@@ -269,20 +186,14 @@ class _DerivativeCalculatorState extends State<_DerivativeCalculator> {
           ),
           const SizedBox(height: 16),
 
-          Row(
-            children: [
-              const Text('Order: '),
-              const SizedBox(width: 8),
-              SegmentedButton<int>(
-                segments: const [
-                  ButtonSegment(value: 1, label: Text("f'")),
-                  ButtonSegment(value: 2, label: Text("f''")),
-                  ButtonSegment(value: 3, label: Text("f'''")),
-                ],
-                selected: {_order},
-                onSelectionChanged: (s) => setState(() => _order = s.first),
-              ),
-            ],
+          TextField(
+            controller: _orderCtrl,
+            decoration: const InputDecoration(
+              labelText: 'Derivative order',
+              hintText: 'Any non-negative integer',
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 24),
 
@@ -342,7 +253,7 @@ class _PartialDerivativeCalculatorState
   final _variablesCtrl = TextEditingController(text: 'x, y');
   final _pointCtrl = TextEditingController(text: '1, 2');
   var _partialVar = 'x';
-  var _order = 1;
+  final _orderCtrl = TextEditingController(text: '1');
   var _result = '';
   var _isComputing = false;
 
@@ -351,25 +262,8 @@ class _PartialDerivativeCalculatorState
     _expressionCtrl.dispose();
     _variablesCtrl.dispose();
     _pointCtrl.dispose();
+    _orderCtrl.dispose();
     super.dispose();
-  }
-
-  double _evaluateMultivar(
-    String expr,
-    List<String> vars,
-    List<double> values,
-  ) {
-    var e = expr.replaceAll(' ', '').toLowerCase();
-    for (var i = 0; i < vars.length; i++) {
-      e = e.replaceAll(vars[i].toLowerCase(), '(${values[i]})');
-    }
-    e = e.replaceAll('pi', '(${math.pi})');
-    e = e.replaceAllMapped(
-      RegExp(r'(?<![a-zA-Z])e(?![a-zA-Z])'),
-      (m) => '(${math.e})',
-    );
-    e = _processFunctions(e);
-    return _calculate(e);
   }
 
   Future<void> _compute() async {
@@ -393,45 +287,31 @@ class _PartialDerivativeCalculatorState
       }
 
       final point = pointStrs.map((s) => double.parse(s)).toList();
-      final varIndex = vars.indexOf(_partialVar);
-      if (varIndex == -1) {
+      if (!vars.contains(_partialVar)) {
         throw Exception('Variable "$_partialVar" not found in variables list');
       }
-
-      double f(List<double> p) => _evaluateMultivar(expr, vars, p);
-
-      // Numerical partial derivative using central difference
-      const h = 1e-5;
-      var derivative = 0.0;
-      final pointPlus = List<double>.from(point);
-      final pointMinus = List<double>.from(point);
-
-      for (var o = 0; o < _order; o++) {
-        pointPlus[varIndex] = point[varIndex] + h;
-        pointMinus[varIndex] = point[varIndex] - h;
-        if (o == 0) {
-          derivative = (f(pointPlus) - f(pointMinus)) / (2 * h);
-        } else {
-          // Higher order - use more complex formula
-          const h2 = h * 10; // Larger step for stability
-          pointPlus[varIndex] = point[varIndex] + h2;
-          pointMinus[varIndex] = point[varIndex] - h2;
-          final plus2 = List<double>.from(point)
-            ..[varIndex] = point[varIndex] + 2 * h2;
-          final minus2 = List<double>.from(point)
-            ..[varIndex] = point[varIndex] - 2 * h2;
-          derivative =
-              (-f(plus2) + 8 * f(pointPlus) - 8 * f(pointMinus) + f(minus2)) /
-              (12 * h2);
-        }
-        point[varIndex] = point[varIndex]; // Reset
+      final order = int.parse(_orderCtrl.text);
+      if (order < 0) {
+        throw const FormatException(
+          'Partial derivative order must be non-negative',
+        );
       }
 
-      final orderStr = _order == 1 ? '' : '$_order';
-      final subscript = _order == 1 ? _partialVar : _partialVar * _order;
+      final result = await MathService.instance.partialDerivative(
+        expr,
+        _partialVar,
+        {for (var i = 0; i < vars.length; i++) vars[i]: point[i]},
+        order,
+      );
+      if (!result.success) {
+        throw Exception(result.error ?? 'Partial derivative failed');
+      }
+
+      final orderStr = order == 1 ? '' : '$order';
+      final subscript = order == 1 ? _partialVar : '$_partialVar^$order';
       setState(() {
         _result =
-            '∂$orderStr f/∂$subscript at (${pointStrs.join(', ')})\n= ${_formatNumber(derivative)}';
+            '∂$orderStr f/∂$subscript at (${pointStrs.join(', ')})\n= ${_formatNumber(result.value)}';
         _isComputing = false;
       });
     } catch (e) {
@@ -510,14 +390,15 @@ class _PartialDerivativeCalculatorState
                 onChanged: (v) => setState(() => _partialVar = v ?? 'x'),
               ),
               const SizedBox(width: 24),
-              const Text('Order: '),
-              SegmentedButton<int>(
-                segments: const [
-                  ButtonSegment(value: 1, label: Text('1st')),
-                  ButtonSegment(value: 2, label: Text('2nd')),
-                ],
-                selected: {_order},
-                onSelectionChanged: (s) => setState(() => _order = s.first),
+              Expanded(
+                child: TextField(
+                  controller: _orderCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Partial derivative order',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
               ),
             ],
           ),
@@ -778,20 +659,6 @@ class _MultipleIntegralCalculatorState
     super.dispose();
   }
 
-  double _evaluateMultivar(String expr, double x, double y, [double z = 0]) {
-    var e = expr.replaceAll(' ', '').toLowerCase();
-    e = e.replaceAll('x', '($x)');
-    e = e.replaceAll('y', '($y)');
-    e = e.replaceAll('z', '($z)');
-    e = e.replaceAll('pi', '(${math.pi})');
-    e = e.replaceAllMapped(
-      RegExp(r'(?<![a-zA-Z])e(?![a-zA-Z])'),
-      (m) => '(${math.e})',
-    );
-    e = _processFunctions(e);
-    return _calculate(e);
-  }
-
   Future<void> _compute() async {
     setState(() {
       _isComputing = true;
@@ -808,23 +675,20 @@ class _MultipleIntegralCalculatorState
       double result;
 
       if (_integralType == 'double') {
-        // Simpson's rule for double integral
-        const n = 50; // Subdivisions per dimension
-        final hx = (xUpper - xLower) / n;
-        final hy = (yUpper - yLower) / n;
-
-        var sum = 0.0;
-        for (var i = 0; i <= n; i++) {
-          final x = xLower + i * hx;
-          final wx = (i == 0 || i == n) ? 1 : (i.isEven ? 2 : 4);
-
-          for (var j = 0; j <= n; j++) {
-            final y = yLower + j * hy;
-            final wy = (j == 0 || j == n) ? 1 : (j.isEven ? 2 : 4);
-            sum += wx * wy * _evaluateMultivar(expr, x, y);
-          }
+        final calculation = await MathService.instance.doubleIntegral(
+          expr,
+          'x',
+          'y',
+          xLower,
+          xUpper,
+          yLower,
+          yUpper,
+          numIntervals: 50,
+        );
+        if (!calculation.success) {
+          throw Exception(calculation.error ?? 'Double integral failed');
         }
-        result = sum * hx * hy / 9;
+        result = calculation.value;
 
         setState(() {
           _result =
@@ -834,32 +698,25 @@ class _MultipleIntegralCalculatorState
           _isComputing = false;
         });
       } else {
-        // Triple integral
         final zLower = double.parse(_zLowerCtrl.text);
         final zUpper = double.parse(_zUpperCtrl.text);
-
-        const n = 20; // Fewer subdivisions for triple
-        final hx = (xUpper - xLower) / n;
-        final hy = (yUpper - yLower) / n;
-        final hz = (zUpper - zLower) / n;
-
-        var sum = 0.0;
-        for (var i = 0; i <= n; i++) {
-          final x = xLower + i * hx;
-          final wx = (i == 0 || i == n) ? 1 : (i.isEven ? 2 : 4);
-
-          for (var j = 0; j <= n; j++) {
-            final y = yLower + j * hy;
-            final wy = (j == 0 || j == n) ? 1 : (j.isEven ? 2 : 4);
-
-            for (var k = 0; k <= n; k++) {
-              final z = zLower + k * hz;
-              final wz = (k == 0 || k == n) ? 1 : (k.isEven ? 2 : 4);
-              sum += wx * wy * wz * _evaluateMultivar(expr, x, y, z);
-            }
-          }
+        final calculation = await MathService.instance.tripleIntegral(
+          expr,
+          'x',
+          'y',
+          'z',
+          xLower,
+          xUpper,
+          yLower,
+          yUpper,
+          zLower,
+          zUpper,
+          numIntervals: 20,
+        );
+        if (!calculation.success) {
+          throw Exception(calculation.error ?? 'Triple integral failed');
         }
-        result = sum * hx * hy * hz / 27;
+        result = calculation.value;
 
         setState(() {
           _result =
@@ -1259,7 +1116,7 @@ class _SeriesCalculatorState extends State<_SeriesCalculator> {
   final _expressionCtrl = TextEditingController(text: 'exp(x)');
   final _variableCtrl = TextEditingController(text: 'x');
   final _centerCtrl = TextEditingController(text: '0');
-  var _terms = 5;
+  final _termsCtrl = TextEditingController(text: '5');
   var _result = '';
   var _isComputing = false;
 
@@ -1268,6 +1125,7 @@ class _SeriesCalculatorState extends State<_SeriesCalculator> {
     _expressionCtrl.dispose();
     _variableCtrl.dispose();
     _centerCtrl.dispose();
+    _termsCtrl.dispose();
     super.dispose();
   }
 
@@ -1281,14 +1139,21 @@ class _SeriesCalculatorState extends State<_SeriesCalculator> {
       final expr = _expressionCtrl.text;
       final variable = _variableCtrl.text;
       final a = double.parse(_centerCtrl.text);
+      final terms = int.parse(_termsCtrl.text);
+      if (terms < 1) {
+        throw const FormatException('Number of terms must be positive');
+      }
 
       // Use Rust backend for Taylor coefficients
       final coefficients = await MathService.instance.taylorCoefficients(
         expr,
         variable,
         a,
-        _terms,
+        terms,
       );
+      if (coefficients.length != terms) {
+        throw Exception('Taylor series calculation returned incomplete data');
+      }
 
       // Build series string
       final termStrings = <String>[];
@@ -1310,7 +1175,7 @@ class _SeriesCalculatorState extends State<_SeriesCalculator> {
       final seriesName = a == 0 ? 'Maclaurin' : 'Taylor';
       setState(() {
         _result =
-            '$seriesName series of $expr around $variable = $a:\n\n${termStrings.join(' + ')}\n\n+ O($variable^$_terms)';
+            '$seriesName series of $expr around $variable = $a:\n\n${termStrings.join(' + ')}\n\n+ O($variable^$terms)';
         _isComputing = false;
       });
     } catch (e) {
@@ -1374,19 +1239,14 @@ class _SeriesCalculatorState extends State<_SeriesCalculator> {
           ),
           const SizedBox(height: 16),
 
-          Row(
-            children: [
-              const Text('Terms: '),
-              Slider(
-                value: _terms.toDouble(),
-                min: 2,
-                max: 10,
-                divisions: 8,
-                label: '$_terms',
-                onChanged: (v) => setState(() => _terms = v.toInt()),
-              ),
-              Text('$_terms'),
-            ],
+          TextField(
+            controller: _termsCtrl,
+            decoration: const InputDecoration(
+              labelText: 'Number of terms',
+              hintText: 'Any positive integer',
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 24),
 

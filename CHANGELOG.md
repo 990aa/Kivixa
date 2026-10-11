@@ -777,3 +777,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix F-Droid build and release issues
 
 ---
+## [0.10.0] - 2026-10-01
+
+### Removed
+- Remove kvtx support and merge functionality with md
+- Removed the Whiteboard tab and its whiteboard-only settings and editor behavior. Handwritten notes remain unchanged.
+
+---
+## [0.10.1] - 2026-10-01
+
+### Changed
+- Version bump to 0.10.1
+
+---

@@ -819,3 +819,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Reduced button aspect ratio so controls remain compact.
 
 ---
+## [0.10.2] - 2026-10-18
+
+### Fixed
+- Markdown editor appearing slightly greyed out issue.
+
+---

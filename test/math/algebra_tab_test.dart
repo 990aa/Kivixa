@@ -46,6 +46,18 @@ void main() {
       expect(find.byType(TextField), findsWidgets);
     });
 
+    testWidgets('matrix dimensions are directly editable', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: MathAlgebraTab())),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rows'), findsOneWidget);
+      expect(find.text('Columns'), findsOneWidget);
+    });
+
     testWidgets('MathAlgebraTab can navigate to Complex tab', (
       WidgetTester tester,
     ) async {

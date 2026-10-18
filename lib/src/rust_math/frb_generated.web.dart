@@ -924,9 +924,6 @@ class MathRustLibWire implements BaseWire {
     double alpha,
   ) => wasmModule.wire__crate__api__anova(port_, groups, alpha);
 
-  JSAny? /* flutter_rust_bridge::for_generated::WireSyncRust2DartDco */
-  wire__crate__api__catalan(JSAny n) => wasmModule.wire__crate__api__catalan(n);
-
   void wire__crate__api__chi_squared_test(
     NativePortType port_,
     JSAny observed,
@@ -938,10 +935,6 @@ class MathRustLibWire implements BaseWire {
     expected,
     alpha,
   );
-
-  JSAny? /* flutter_rust_bridge::for_generated::WireSyncRust2DartDco */
-  wire__crate__api__combinations(JSAny n, JSAny r) =>
-      wasmModule.wire__crate__api__combinations(n, r);
 
   JSAny? /* flutter_rust_bridge::for_generated::WireSyncRust2DartDco */
   wire__crate__api__complex_convert(double real, double imag, bool to_polar) =>
@@ -1398,10 +1391,6 @@ class MathRustLibWire implements BaseWire {
     order,
   );
 
-  JSAny? /* flutter_rust_bridge::for_generated::WireSyncRust2DartDco */
-  wire__crate__api__permutations(JSAny n, JSAny r) =>
-      wasmModule.wire__crate__api__permutations(n, r);
-
   void wire__crate__api__polynomial_regression(
     NativePortType port_,
     JSAny x_data,
@@ -1546,18 +1535,12 @@ extension type MathRustLibWasmModule._(JSObject _) implements JSObject {
     double alpha,
   );
 
-  external JSAny? /* flutter_rust_bridge::for_generated::WireSyncRust2DartDco */
-  wire__crate__api__catalan(JSAny n);
-
   external void wire__crate__api__chi_squared_test(
     NativePortType port_,
     JSAny observed,
     JSAny expected,
     double alpha,
   );
-
-  external JSAny? /* flutter_rust_bridge::for_generated::WireSyncRust2DartDco */
-  wire__crate__api__combinations(JSAny n, JSAny r);
 
   external JSAny? /* flutter_rust_bridge::for_generated::WireSyncRust2DartDco */
   wire__crate__api__complex_convert(double real, double imag, bool to_polar);
@@ -1857,9 +1840,6 @@ extension type MathRustLibWasmModule._(JSObject _) implements JSObject {
     JSAny point,
     int order,
   );
-
-  external JSAny? /* flutter_rust_bridge::for_generated::WireSyncRust2DartDco */
-  wire__crate__api__permutations(JSAny n, JSAny r);
 
   external void wire__crate__api__polynomial_regression(
     NativePortType port_,

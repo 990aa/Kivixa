@@ -1246,17 +1246,6 @@ class MathRustLibWire implements BaseWire {
         )
       >();
 
-  WireSyncRust2DartDco wire__crate__api__catalan(int n) {
-    return _wire__crate__api__catalan(n);
-  }
-
-  late final _wire__crate__api__catalanPtr =
-      _lookup<ffi.NativeFunction<WireSyncRust2DartDco Function(ffi.Uint64)>>(
-        'frbgen_kivixa_wire__crate__api__catalan',
-      );
-  late final _wire__crate__api__catalan = _wire__crate__api__catalanPtr
-      .asFunction<WireSyncRust2DartDco Function(int)>();
-
   void wire__crate__api__chi_squared_test(
     int port_,
     ffi.Pointer<wire_cst_list_prim_f_64_loose> observed,
@@ -1292,20 +1281,6 @@ class MathRustLibWire implements BaseWire {
               double,
             )
           >();
-
-  WireSyncRust2DartDco wire__crate__api__combinations(int n, int r) {
-    return _wire__crate__api__combinations(n, r);
-  }
-
-  late final _wire__crate__api__combinationsPtr =
-      _lookup<
-        ffi.NativeFunction<
-          WireSyncRust2DartDco Function(ffi.Uint64, ffi.Uint64)
-        >
-      >('frbgen_kivixa_wire__crate__api__combinations');
-  late final _wire__crate__api__combinations =
-      _wire__crate__api__combinationsPtr
-          .asFunction<WireSyncRust2DartDco Function(int, int)>();
 
   WireSyncRust2DartDco wire__crate__api__complex_convert(
     double real,
@@ -2717,20 +2692,6 @@ class MathRustLibWire implements BaseWire {
             )
           >();
 
-  WireSyncRust2DartDco wire__crate__api__permutations(int n, int r) {
-    return _wire__crate__api__permutations(n, r);
-  }
-
-  late final _wire__crate__api__permutationsPtr =
-      _lookup<
-        ffi.NativeFunction<
-          WireSyncRust2DartDco Function(ffi.Uint64, ffi.Uint64)
-        >
-      >('frbgen_kivixa_wire__crate__api__permutations');
-  late final _wire__crate__api__permutations =
-      _wire__crate__api__permutationsPtr
-          .asFunction<WireSyncRust2DartDco Function(int, int)>();
-
   void wire__crate__api__polynomial_regression(
     int port_,
     ffi.Pointer<wire_cst_list_prim_f_64_loose> x_data,
@@ -3095,21 +3056,6 @@ typedef DartPostCObjectFnTypeFunction =
     ffi.Bool Function(DartPort port_id, ffi.Pointer<ffi.Void> message);
 typedef DartDartPostCObjectFnTypeFunction =
     bool Function(DartDartPort port_id, ffi.Pointer<ffi.Void> message);
-
-final class WireSyncRust2DartSse extends ffi.Struct {
-  external ffi.Pointer<ffi.Uint8> ptr;
-
-  @ffi.Int32()
-  external int len;
-
-  static ffi.Pointer<WireSyncRust2DartSse> $allocate(
-    ffi.Allocator $allocator, {
-    required ffi.Pointer<ffi.Uint8> ptr,
-    required int len,
-  }) => $allocator<WireSyncRust2DartSse>()
-    ..ref.ptr = ptr
-    ..ref.len = len;
-}
 
 final class wire_cst_calculus_result extends ffi.Struct {
   @ffi.Bool()

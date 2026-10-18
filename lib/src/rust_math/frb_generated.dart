@@ -77,7 +77,7 @@ class MathRustLib
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -1636446782;
+  int get rustContentHash => -1164624636;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -94,15 +94,11 @@ abstract class MathRustLibApi extends BaseApi {
     required double alpha,
   });
 
-  DiscreteResult crateApiCatalan({required BigInt n});
-
   Future<HypothesisTestResult> crateApiChiSquaredTest({
     required List<double> observed,
     required List<double> expected,
     required double alpha,
   });
-
-  DiscreteResult crateApiCombinations({required BigInt n, required BigInt r});
 
   ComplexResult crateApiComplexConvert({
     required double real,
@@ -379,8 +375,6 @@ abstract class MathRustLibApi extends BaseApi {
     required int order,
   });
 
-  DiscreteResult crateApiPermutations({required BigInt n, required BigInt r});
-
   Future<RegressionResult> crateApiPolynomialRegression({
     required List<double> xData,
     required List<double> yData,
@@ -484,28 +478,6 @@ class MathRustLibApiImpl extends MathRustLibApiImplPlatform
       const TaskConstMeta(debugName: 'anova', argNames: ['groups', 'alpha']);
 
   @override
-  DiscreteResult crateApiCatalan({required BigInt n}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final arg0 = cst_encode_u_64(n);
-          return wire.wire__crate__api__catalan(arg0);
-        },
-        codec: DcoCodec(
-          decodeSuccessData: dco_decode_discrete_result,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiCatalanConstMeta,
-        argValues: [n],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiCatalanConstMeta =>
-      const TaskConstMeta(debugName: 'catalan', argNames: ['n']);
-
-  @override
   Future<HypothesisTestResult> crateApiChiSquaredTest({
     required List<double> observed,
     required List<double> expected,
@@ -539,29 +511,6 @@ class MathRustLibApiImpl extends MathRustLibApiImplPlatform
     debugName: 'chi_squared_test',
     argNames: ['observed', 'expected', 'alpha'],
   );
-
-  @override
-  DiscreteResult crateApiCombinations({required BigInt n, required BigInt r}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final arg0 = cst_encode_u_64(n);
-          final arg1 = cst_encode_u_64(r);
-          return wire.wire__crate__api__combinations(arg0, arg1);
-        },
-        codec: DcoCodec(
-          decodeSuccessData: dco_decode_discrete_result,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiCombinationsConstMeta,
-        argValues: [n, r],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiCombinationsConstMeta =>
-      const TaskConstMeta(debugName: 'combinations', argNames: ['n', 'r']);
 
   @override
   ComplexResult crateApiComplexConvert({
@@ -2230,29 +2179,6 @@ class MathRustLibApiImpl extends MathRustLibApiImplPlatform
     debugName: 'partial_derivative',
     argNames: ['expression', 'variable', 'point', 'order'],
   );
-
-  @override
-  DiscreteResult crateApiPermutations({required BigInt n, required BigInt r}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final arg0 = cst_encode_u_64(n);
-          final arg1 = cst_encode_u_64(r);
-          return wire.wire__crate__api__permutations(arg0, arg1);
-        },
-        codec: DcoCodec(
-          decodeSuccessData: dco_decode_discrete_result,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiPermutationsConstMeta,
-        argValues: [n, r],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiPermutationsConstMeta =>
-      const TaskConstMeta(debugName: 'permutations', argNames: ['n', 'r']);
 
   @override
   Future<RegressionResult> crateApiPolynomialRegression({

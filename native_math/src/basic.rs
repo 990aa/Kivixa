@@ -108,7 +108,7 @@ pub fn evaluate_expression(expression: &str) -> ExpressionResult {
             "pi" => Some(std::f64::consts::PI),
             "e" => Some(std::f64::consts::E),
             "tau" => Some(std::f64::consts::TAU),
-            "phi" => Some(1.618033988749895), // Golden ratio
+            "phi" => Some(std::f64::consts::GOLDEN_RATIO),
             "c" => Some(299792458.0),
             "G" => Some(6.67430e-11),
             "h" => Some(6.62607015e-34),
@@ -347,7 +347,7 @@ pub fn get_constant(name: &str) -> f64 {
         "pi" | "π" => std::f64::consts::PI,
         "e" => std::f64::consts::E,
         "tau" | "τ" => std::f64::consts::TAU,
-        "phi" | "φ" | "golden" => 1.618033988749895,
+        "phi" | "φ" | "golden" => std::f64::consts::GOLDEN_RATIO,
         "sqrt2" | "√2" => std::f64::consts::SQRT_2,
         "sqrt3" | "√3" => 1.7320508075688772,
         "ln2" => std::f64::consts::LN_2,

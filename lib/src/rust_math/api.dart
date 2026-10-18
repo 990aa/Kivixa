@@ -457,14 +457,6 @@ BigInt gcd({required BigInt a, required BigInt b}) =>
 BigInt lcm({required BigInt a, required BigInt b}) =>
     MathRustLib.instance.api.crateApiLcm(a: a, b: b);
 
-/// Compute combinations nCr
-DiscreteResult combinations({required BigInt n, required BigInt r}) =>
-    MathRustLib.instance.api.crateApiCombinations(n: n, r: r);
-
-/// Compute permutations nPr
-DiscreteResult permutations({required BigInt n, required BigInt r}) =>
-    MathRustLib.instance.api.crateApiPermutations(n: n, r: r);
-
 /// Compute factorial
 DiscreteResult factorial({required BigInt n}) =>
     MathRustLib.instance.api.crateApiFactorial(n: n);
@@ -531,10 +523,6 @@ DiscreteResult eulerTotient({required BigInt n}) =>
 /// Get divisors of a number
 DiscreteResult listDivisors({required BigInt n}) =>
     MathRustLib.instance.api.crateApiListDivisors(n: n);
-
-/// Catalan number
-DiscreteResult catalan({required BigInt n}) =>
-    MathRustLib.instance.api.crateApiCatalan(n: n);
 
 /// Check if perfect number
 DiscreteResult isPerfect({required BigInt n}) =>

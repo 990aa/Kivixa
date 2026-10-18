@@ -152,7 +152,22 @@ class NewNoteButton extends StatefulWidget {
 class _NewNoteButtonState extends State<NewNoteButton> {
   final ValueNotifier<bool> isDialOpen = ValueNotifier(false);
 
+  @override
+  void dispose() {
+    isDialOpen.dispose();
+    super.dispose();
+  }
+
+  Future<void> _closeDial() async {
+    if (!isDialOpen.value) return;
+    isDialOpen.value = false;
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+  }
+
   Future<void> _createHandwrittenNote() async {
+    await _closeDial();
+    if (!mounted) return;
+
     // Show orientation dialog
     final orientation = await showDialog<PageOrientation>(
       context: context,
@@ -180,6 +195,7 @@ class _NewNoteButtonState extends State<NewNoteButton> {
       spacing: 3,
       mini: true,
       openCloseDial: isDialOpen,
+      closeManually: true,
       childPadding: const EdgeInsets.all(5),
       spaceBetweenChildren: 4,
       switchLabelPosition: Directionality.of(context) == TextDirection.rtl,
@@ -201,14 +217,14 @@ class _NewNoteButtonState extends State<NewNoteButton> {
           child: const Icon(Icons.description),
           label: 'New Markdown Note',
           onTap: () async {
+            await _closeDial();
+            if (!context.mounted) return;
             if (widget.path == null) {
               context.push(RoutePaths.markdown);
             } else {
               final basePath = await FileManager.newFilePath('${widget.path}/');
-              // Append .md extension for markdown notes
-              final newFilePath = '$basePath.md';
               if (!context.mounted) return;
-              context.push(RoutePaths.markdownFilePath(newFilePath));
+              context.push(RoutePaths.markdownFilePath(basePath));
             }
           },
         ),
@@ -216,7 +232,8 @@ class _NewNoteButtonState extends State<NewNoteButton> {
           SpeedDialChild(
             child: const Icon(Icons.create_new_folder),
             label: t.home.newFolder.newFolder,
-            onTap: () {
+            onTap: () async {
+              await _closeDial();
               showDialog(
                 context: context,
                 builder: (context) => NewFolderDialog(
@@ -230,6 +247,7 @@ class _NewNoteButtonState extends State<NewNoteButton> {
           child: const Icon(Icons.note_add),
           label: t.home.create.importNote,
           onTap: () async {
+            await _closeDial();
             final result = await FilePicker.platform.pickFiles(
               type: FileType.any,
               allowMultiple: false,

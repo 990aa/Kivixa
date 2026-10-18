@@ -38,5 +38,18 @@ void main() {
       // Should have scrollable content
       expect(find.byType(SingleChildScrollView), findsWidgets);
     });
+
+    testWidgets('prime and factor tools share one tab', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: MathDiscreteTab())),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Primes & Factors'), findsOneWidget);
+      expect(find.byType(Tab), findsNWidgets(3));
+      expect(find.text('Combinatorics'), findsNothing);
+    });
   });
 }

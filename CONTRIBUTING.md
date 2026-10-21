@@ -67,7 +67,9 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 * Follow the official [Dart Style Guide](https://dart.dev/guides/language/effective-dart/style)
 * Use `flutter analyze` to check for issues
-* Use `dart format .` to format your code
+* Use `.\scripts\format_dart.ps1` to format all tracked Dart files. This avoids
+  formatting generated files under `build/`, which can have separate package
+  configurations.
 * Maximum line length: 80 characters (flexible for readability)
 
 ### Code Quality

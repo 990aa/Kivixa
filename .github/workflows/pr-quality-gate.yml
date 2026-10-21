@@ -310,6 +310,8 @@ jobs:
       native: ${{ steps.set_outputs.outputs.native }}
       native_audio: ${{ steps.set_outputs.outputs.native_audio }}
       native_math: ${{ steps.set_outputs.outputs.native_math }}
+      android: ${{ steps.set_outputs.outputs.android }}
+      windows: ${{ steps.set_outputs.outputs.windows }}
       dart_other: ${{ steps.set_outputs.outputs.dart_other }}
     steps:
       - uses: actions/checkout@v6
@@ -330,6 +332,10 @@ jobs:
               - 'native_audio/**'
             native_math:
               - 'native_math/**'
+            android:
+              - 'android/**'
+            windows:
+              - 'windows/**'
             dart_other:
               - '**'
               - '!native/**'
@@ -347,6 +353,8 @@ jobs:
           echo "native=true" >> "$GITHUB_OUTPUT"
           echo "native_audio=true" >> "$GITHUB_OUTPUT"
           echo "native_math=true" >> "$GITHUB_OUTPUT"
+          echo "android=true" >> "$GITHUB_OUTPUT"
+          echo "windows=true" >> "$GITHUB_OUTPUT"
           echo "dart_other=true" >> "$GITHUB_OUTPUT"
 
       - name: Set outputs
@@ -357,11 +365,15 @@ jobs:
             echo "native=${{ steps.manual_filter.outputs.native }}" >> "$GITHUB_OUTPUT"
             echo "native_audio=${{ steps.manual_filter.outputs.native_audio }}" >> "$GITHUB_OUTPUT"
             echo "native_math=${{ steps.manual_filter.outputs.native_math }}" >> "$GITHUB_OUTPUT"
+            echo "android=${{ steps.manual_filter.outputs.android }}" >> "$GITHUB_OUTPUT"
+            echo "windows=${{ steps.manual_filter.outputs.windows }}" >> "$GITHUB_OUTPUT"
             echo "dart_other=${{ steps.manual_filter.outputs.dart_other }}" >> "$GITHUB_OUTPUT"
           else
             echo "native=${{ steps.filter.outputs.native }}" >> "$GITHUB_OUTPUT"
             echo "native_audio=${{ steps.filter.outputs.native_audio }}" >> "$GITHUB_OUTPUT"
             echo "native_math=${{ steps.filter.outputs.native_math }}" >> "$GITHUB_OUTPUT"
+            echo "android=${{ steps.filter.outputs.android }}" >> "$GITHUB_OUTPUT"
+            echo "windows=${{ steps.filter.outputs.windows }}" >> "$GITHUB_OUTPUT"
             echo "dart_other=${{ steps.filter.outputs.dart_other }}" >> "$GITHUB_OUTPUT"
           fi
 
@@ -369,7 +381,7 @@ jobs:
     name: Build Android ARM64
     runs-on: ubuntu-latest
     needs: [resolve-target, path-filter]
-    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.workflow == 'android' || inputs.workflow == 'all') && (needs.path-filter.outputs.dart_other == 'true' || needs.path-filter.outputs.native == 'true' || needs.path-filter.outputs.native_audio == 'true' || needs.path-filter.outputs.native_math == 'true') }}
+    if: ${{ (github.event_name != 'workflow_dispatch' || inputs.workflow == 'android' || inputs.workflow == 'all') && (needs.path-filter.outputs.dart_other == 'true' || needs.path-filter.outputs.native == 'true' || needs.path-filter.outputs.native_audio == 'true' || needs.path-filter.outputs.native_math == 'true' || needs.path-filter.outputs.android == 'true' || needs.path-filter.outputs.windows == 'true') }}
     steps:
       - name: Free up disk space
         run: |
@@ -410,7 +422,7 @@ jobs:
           add-to-path: true
 
       - name: Build native (Android)
-        if: ${{ needs.path-filter.outputs.native == 'true' || needs.path-filter.outputs.dart_other == 'true' }}
+        if: ${{ needs.path-filter.outputs.native == 'true' || needs.path-filter.outputs.dart_other == 'true' || needs.path-filter.outputs.android == 'true' || needs.path-filter.outputs.windows == 'true' }}
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
@@ -432,7 +444,7 @@ jobs:
           fi
 
       - name: Build native_audio (Android)
-        if: ${{ needs.path-filter.outputs.native_audio == 'true' || needs.path-filter.outputs.dart_other == 'true' }}
+        if: ${{ needs.path-filter.outputs.native_audio == 'true' || needs.path-filter.outputs.dart_other == 'true' || needs.path-filter.outputs.android == 'true' || needs.path-filter.outputs.windows == 'true' }}
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
@@ -450,7 +462,7 @@ jobs:
           cp native_audio/target/aarch64-linux-android/release/libkivixa_audio.so android/app/src/main/jniLibs/arm64-v8a/
 
       - name: Build native_math (Android)
-        if: ${{ needs.path-filter.outputs.native_math == 'true' || needs.path-filter.outputs.dart_other == 'true' }}
+        if: ${{ needs.path-filter.outputs.native_math == 'true' || needs.path-filter.outputs.dart_other == 'true' || needs.path-filter.outputs.android == 'true' || needs.path-filter.outputs.windows == 'true' }}
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
@@ -468,7 +480,7 @@ jobs:
           cp native_math/target/aarch64-linux-android/release/libkivixa_math.so android/app/src/main/jniLibs/arm64-v8a/
 
       - name: Build Android APK
-        if: ${{ needs.path-filter.outputs.dart_other == 'true' }}
+        if: ${{ needs.path-filter.outputs.dart_other == 'true' || needs.path-filter.outputs.android == 'true' || needs.path-filter.outputs.windows == 'true' }}
         run: |
           flutter pub get
           flutter build apk --release --target-platform android-arm64

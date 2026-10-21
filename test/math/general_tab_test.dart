@@ -47,7 +47,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should have trigonometric buttons
+      await tester.tap(find.text('Trigonometric functions'));
+      await tester.pumpAndSettle();
+
+      // Should have trigonometric buttons after opening the dropdown
       expect(find.text('sin'), findsWidgets);
       expect(find.text('cos'), findsWidgets);
       expect(find.text('sec'), findsWidgets);
@@ -90,6 +93,18 @@ void main() {
 
       // Should have constants section with ListTile
       expect(find.text('Constants'), findsOneWidget);
+    });
+
+    testWidgets('trigonometric controls are grouped', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: MathGeneralTab())),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Trigonometric functions'), findsOneWidget);
+      expect(find.byType(ExpansionTile), findsOneWidget);
     });
   });
 }

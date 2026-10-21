@@ -399,16 +399,16 @@ pub fn taylor_coefficients(
     num_terms: u32,
 ) -> Vec<f64> {
     let mut coeffs = Vec::new();
-    let mut factorial = 1u64;
+    let mut factorial = 1.0_f64;
 
     for n in 0..num_terms {
         if n > 0 {
-            factorial *= n as u64;
+            factorial *= n as f64;
         }
 
         let deriv = differentiate(expression, variable, around, n);
         if deriv.success {
-            coeffs.push(deriv.value / factorial as f64);
+            coeffs.push(deriv.value / factorial);
         } else {
             coeffs.push(f64::NAN);
         }

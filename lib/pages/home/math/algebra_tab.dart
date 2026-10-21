@@ -71,12 +71,17 @@ class _Matrix {
   int rows;
   int cols;
   List<List<TextEditingController>> controllers;
+  late final TextEditingController rowsController;
+  late final TextEditingController colsController;
 
   _Matrix({required this.name, this.rows = 2, this.cols = 2})
     : controllers = List.generate(
         rows,
         (_) => List.generate(cols, (_) => TextEditingController(text: '0')),
-      );
+      ) {
+    rowsController = TextEditingController(text: rows.toString());
+    colsController = TextEditingController(text: cols.toString());
+  }
 
   void resize(int newRows, int newCols) {
     final newControllers = List.generate(
@@ -99,6 +104,8 @@ class _Matrix {
     controllers = newControllers;
     rows = newRows;
     cols = newCols;
+    rowsController.text = rows.toString();
+    colsController.text = cols.toString();
   }
 
   List<List<double>> getData() {
@@ -108,6 +115,8 @@ class _Matrix {
   }
 
   void dispose() {
+    rowsController.dispose();
+    colsController.dispose();
     for (final row in controllers) {
       for (final c in row) {
         c.dispose();
@@ -1194,57 +1203,18 @@ class _MatrixCalculatorState extends State<_MatrixCalculator> {
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const Spacer(),
-                // Dimension controls
-                IconButton(
-                  icon: const Icon(Icons.remove, size: 18),
-                  onPressed: matrix.rows > 1
-                      ? () {
-                          setState(
-                            () => matrix.resize(matrix.rows - 1, matrix.cols),
-                          );
-                        }
-                      : null,
-                  visualDensity: VisualDensity.compact,
-                  tooltip: 'Remove row',
-                ),
-                Text('${matrix.rows}×${matrix.cols}'),
-                IconButton(
-                  icon: const Icon(Icons.add, size: 18),
-                  onPressed: matrix.rows < 10
-                      ? () {
-                          setState(
-                            () => matrix.resize(matrix.rows + 1, matrix.cols),
-                          );
-                        }
-                      : null,
-                  visualDensity: VisualDensity.compact,
-                  tooltip: 'Add row',
+                _dimensionField(
+                  matrix.rowsController,
+                  'Rows',
+                  (value) =>
+                      matrix.resize(value.clamp(1, 50).toInt(), matrix.cols),
                 ),
                 const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.remove, size: 18),
-                  onPressed: matrix.cols > 1
-                      ? () {
-                          setState(
-                            () => matrix.resize(matrix.rows, matrix.cols - 1),
-                          );
-                        }
-                      : null,
-                  visualDensity: VisualDensity.compact,
-                  tooltip: 'Remove column',
-                ),
-                const Text('cols'),
-                IconButton(
-                  icon: const Icon(Icons.add, size: 18),
-                  onPressed: matrix.cols < 10
-                      ? () {
-                          setState(
-                            () => matrix.resize(matrix.rows, matrix.cols + 1),
-                          );
-                        }
-                      : null,
-                  visualDensity: VisualDensity.compact,
-                  tooltip: 'Add column',
+                _dimensionField(
+                  matrix.colsController,
+                  'Columns',
+                  (value) =>
+                      matrix.resize(matrix.rows, value.clamp(1, 50).toInt()),
                 ),
                 if (_matrices.length > 1)
                   IconButton(
@@ -1259,6 +1229,27 @@ class _MatrixCalculatorState extends State<_MatrixCalculator> {
             _buildMatrixGrid(matrix),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _dimensionField(
+    TextEditingController controller,
+    String label,
+    void Function(int) resize,
+  ) {
+    return SizedBox(
+      width: 72,
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(labelText: label, isDense: true),
+        keyboardType: TextInputType.number,
+        onSubmitted: (text) {
+          final value = int.tryParse(text);
+          if (value != null) {
+            setState(() => resize(value));
+          }
+        },
       ),
     );
   }

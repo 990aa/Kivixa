@@ -42,6 +42,35 @@ void main() {
       expect(find.byType(TextField), findsWidgets);
     });
 
+    testWidgets('calculus controls accept arbitrary orders and terms', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: MathCalculusTab())),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Derivative order'), findsOneWidget);
+      await tester.tap(find.text('Partial'));
+      await tester.pumpAndSettle();
+      expect(find.text('Partial derivative order'), findsOneWidget);
+    });
+
+    testWidgets('series exposes a typed term count', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: MathCalculusTab())),
+      );
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(TabBar), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Series'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Number of terms'), findsOneWidget);
+    });
+
     testWidgets('MathCalculusTab can navigate to Partial tab', (
       WidgetTester tester,
     ) async {

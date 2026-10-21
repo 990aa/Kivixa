@@ -522,18 +522,6 @@ pub fn lcm(a: u64, b: u64) -> u64 {
     discrete::lcm(a, b)
 }
 
-/// Compute combinations nCr
-#[frb(sync)]
-pub fn combinations(n: u64, r: u64) -> DiscreteResult {
-    discrete::combinations(n, r)
-}
-
-/// Compute permutations nPr
-#[frb(sync)]
-pub fn permutations(n: u64, r: u64) -> DiscreteResult {
-    discrete::permutations(n, r)
-}
-
 /// Compute factorial
 #[frb(sync)]
 pub fn factorial(n: u64) -> DiscreteResult {
@@ -605,12 +593,6 @@ pub fn euler_totient(n: u64) -> DiscreteResult {
 #[frb(sync)]
 pub fn list_divisors(n: u64) -> DiscreteResult {
     discrete::list_divisors(n)
-}
-
-/// Catalan number
-#[frb(sync)]
-pub fn catalan(n: u64) -> DiscreteResult {
-    discrete::catalan(n)
 }
 
 /// Check if perfect number

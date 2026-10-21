@@ -56,7 +56,7 @@ Relates to #
 - [ ] New and existing unit tests pass locally with my changes
 - [ ] Any dependent changes have been merged and published
 - [ ] I have run `flutter analyze` with no issues
-- [ ] I have run `dart format .` to format the code
+- [ ] I have run `.\scripts\format_dart.ps1` to format all tracked Dart files
 
 ## Performance Impact
 <!-- Describe any performance implications of your changes -->

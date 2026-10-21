@@ -766,7 +766,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Redesigned Math Interface**: Totally revamped the General Calculator layout. Placed Backspace/Clear adjacent to the input field, clearly grouped trigonometric, logarithmic, and mathematical features, and optimized the layout for maximum operational UX.
 
 ---
-## [0.10.3] - 2026-10-21
+## [0.10.4] - 2026-10-21
 
 ### Changes
 
@@ -801,10 +801,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Limited calculator width to prevent oversized Windows buttons.
   - Reduced button aspect ratio so controls remain compact.
 
----
-## [0.10.4] - 2026-10-21
-
-### Fixed
+### Fixes
 - Fixed math and ai module initialization issue
 
 ---

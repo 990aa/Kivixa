@@ -750,8 +750,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Reordered "Delete Data on Uninstall" to be placed just above the "Clear App Data" setting and just below the "Open Kivixa Folder" setting.
   
 ---
-
-
 ## [0.9.0] - 2026-05-22
 
 ### Added
@@ -768,15 +766,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Redesigned Math Interface**: Totally revamped the General Calculator layout. Placed Backspace/Clear adjacent to the input field, clearly grouped trigonometric, logarithmic, and mathematical features, and optimized the layout for maximum operational UX.
 
 ---
-## [0.9.3] - 2026-09-30
-
-### Changed
-- Fix android notes disappearing issue
-- Fix android and windows builds
-- Fix F-Droid build and release issues
-
----
-## [0.10.1] - 2026-10-01
+## [0.10.4] - 2026-10-21
 
 ### Changes
 
@@ -811,10 +801,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Limited calculator width to prevent oversized Windows buttons.
   - Reduced button aspect ratio so controls remain compact.
 
----
-## [0.10.2] - 2026-10-18
-
-### Fixed
-- Markdown editor appearing slightly greyed out issue.
+### Fixes
+- Fixed math and ai module initialization issue
 
 ---

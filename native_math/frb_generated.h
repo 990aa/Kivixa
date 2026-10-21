@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-// EXTRA BEGIN
+
 typedef struct DartCObject *WireSyncRust2DartDco;
 typedef struct WireSyncRust2DartSse {
   uint8_t *ptr;

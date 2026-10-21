@@ -16,6 +16,7 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 # Flutter Rust Bridge for Dart interop
 flutter_rust_bridge = "=2.13.0"
+libc = "=0.2.182"
 
 # Error handling
 anyhow = "1.0"

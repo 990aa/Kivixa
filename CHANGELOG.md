@@ -805,3 +805,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed math and ai module initialization issue
 
 ---
+## [0.10.5] - 2026-10-24
+
+### Changed
+- Version bump to 0.10.5
+
+---

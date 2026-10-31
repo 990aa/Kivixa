@@ -234,6 +234,7 @@ class _NewNoteButtonState extends State<NewNoteButton> {
             label: t.home.newFolder.newFolder,
             onTap: () async {
               await _closeDial();
+              if (!context.mounted) return;
               showDialog(
                 context: context,
                 builder: (context) => NewFolderDialog(

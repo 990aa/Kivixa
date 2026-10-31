@@ -68,6 +68,10 @@ class _AdvancedMarkdownEditorState extends State<AdvancedMarkdownEditor>
   var _wordCount = 0;
   var _charCount = 0;
   var _lastThemeIsDark = false;
+  final List<String> _undoHistory = [];
+  final List<String> _redoHistory = [];
+  String? _lastHistoryText;
+  var _restoringHistory = false;
 
   final _audioEngine = AudioNeuralEngine();
   final _audioRecorder = AudioRecordingService();
@@ -199,6 +203,7 @@ class _AdvancedMarkdownEditorState extends State<AdvancedMarkdownEditor>
     _codeController?.removeListener(_onTextChanged);
     _codeController?.dispose();
     _codeController = CodeController(text: currentText, language: markdown);
+    _lastHistoryText = currentText;
     if (selection != null && selection.isValid) {
       try {
         _codeController!.selection = selection;
@@ -287,9 +292,55 @@ class _AdvancedMarkdownEditorState extends State<AdvancedMarkdownEditor>
   }
 
   void _onTextChanged() {
+    final controller = _codeController;
+    if (controller == null) return;
+    if (!_restoringHistory &&
+        _lastHistoryText != null &&
+        _lastHistoryText != controller.text) {
+      _undoHistory.add(_lastHistoryText!);
+      _redoHistory.clear();
+    }
+    _lastHistoryText = controller.text;
     _updateCounts();
     _autosaveTimer?.cancel();
     _autosaveTimer = Timer(const Duration(seconds: 2), _saveFile);
+  }
+
+  void _undoMarkdownEdit() {
+    final controller = _codeController;
+    if (controller == null || _undoHistory.isEmpty) return;
+
+    final currentText = controller.text;
+    final previousText = _undoHistory.removeLast();
+    _redoHistory.add(currentText);
+    _setTextFromHistory(previousText);
+  }
+
+  void _redoMarkdownEdit() {
+    final controller = _codeController;
+    if (controller == null || _redoHistory.isEmpty) return;
+
+    final currentText = controller.text;
+    final nextText = _redoHistory.removeLast();
+    _undoHistory.add(currentText);
+    _setTextFromHistory(nextText);
+  }
+
+  void _setTextFromHistory(String text) {
+    final controller = _codeController;
+    if (controller == null) return;
+    _restoringHistory = true;
+    controller.value = controller.value.copyWith(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+      composing: TextRange.empty,
+    );
+    _restoringHistory = false;
+    _lastHistoryText = text;
+    _updateCounts();
+    _autosaveTimer?.cancel();
+    _autosaveTimer = Timer(const Duration(seconds: 2), _saveFile);
+    setState(() {});
   }
 
   void _updateCounts() {
@@ -1265,6 +1316,16 @@ class _AdvancedMarkdownEditorState extends State<AdvancedMarkdownEditor>
               ),
         actions: [
           if (!_isTimeTraveling) ...[
+            IconButton(
+              icon: const Icon(Icons.undo),
+              tooltip: 'Undo',
+              onPressed: _undoHistory.isNotEmpty ? _undoMarkdownEdit : null,
+            ),
+            IconButton(
+              icon: const Icon(Icons.redo),
+              tooltip: 'Redo',
+              onPressed: _redoHistory.isNotEmpty ? _redoMarkdownEdit : null,
+            ),
             // Heading dropdown
             PopupMenuButton<int>(
               icon: const Icon(Icons.title),

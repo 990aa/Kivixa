@@ -807,7 +807,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [0.10.5] - 2026-10-24
 
+### Added
+- **Markdown Undo/Redo**: Added toolbar buttons for undoing and redoing Markdown edits, including formatting, insertion, dictation, and other editor changes.
+- **Handwritten Note Text Boxes**: Added movable, resizable text boxes that can be created anywhere on a handwritten-note page.
+- **Text Box Typography**: Added font selection and custom font-size controls for handwritten-note text boxes.
+- **Text Box Editing Controls**: Added delete controls while editing plus right-click and long-press actions to edit or delete completed text boxes.
+
 ### Changed
-- Version bump to 0.10.5
+- **Handwritten Note Text Persistence**: Text-box content, position, dimensions, font, and font size are saved in KVX files and retained across reopening, duplication, preview, and PDF export.
+- **Handwritten Note Text Interaction**: Clicking outside a text box finishes editing while leaving the rendered text in place.
+
+### Fixed
+- **Handwritten Note Text Placement**: Fixed text being constrained to the top-left page position by replacing the page-wide text overlay with independently positioned text boxes.
 
 ---

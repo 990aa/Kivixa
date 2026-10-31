@@ -32,6 +32,7 @@ import 'package:kivixa/data/editor/editor_core_info.dart';
 import 'package:kivixa/data/editor/editor_exporter.dart';
 import 'package:kivixa/data/editor/editor_history.dart';
 import 'package:kivixa/data/editor/page.dart';
+import 'package:kivixa/data/editor/text_box.dart';
 import 'package:kivixa/data/extensions/change_notifier_extensions.dart';
 import 'package:kivixa/data/extensions/matrix4_extensions.dart';
 import 'package:kivixa/data/file_manager/file_manager.dart';
@@ -1587,17 +1588,8 @@ class EditorState extends State<Editor> {
           toggleTextEditing: () => setState(() {
             if (currentTool == Tool.textEditing) {
               currentTool = Pen.currentPen;
-              for (final page in coreInfo.pages) {
-                // unselect text, but maintain cursor position
-                page.quill.controller.moveCursorToPosition(
-                  page.quill.controller.selection.extentOffset,
-                );
-                page.quill.focusNode.unfocus();
-              }
             } else {
               currentTool = Tool.textEditing;
-              quillFocus.value = coreInfo.pages[currentPageIndex].quill
-                ..focusNode.requestFocus();
             }
           }),
           undo: undo,
@@ -2065,6 +2057,9 @@ class EditorState extends State<Editor> {
       },
       currentToolIsSelect: currentTool is Select,
       currentScale: _transformationController.value.approxScale,
+      onTextBoxChanged: () {
+        if (!coreInfo.readOnly) autosaveAfterDelay();
+      },
     );
   }
 
@@ -2100,6 +2095,16 @@ class EditorState extends State<Editor> {
               .toList(),
           images: page.images
               .map((image) => image.copy()..pageIndex += 1)
+              .toList(),
+          textBoxes: page.textBoxes
+              .map(
+                (textBox) => EditorTextBox(
+                  rect: textBox.rect,
+                  text: textBox.text,
+                  fontFamily: textBox.fontFamily,
+                  fontSize: textBox.fontSize,
+                ),
+              )
               .toList(),
           quill: QuillStruct(
             controller: flutter_quill.QuillController(
@@ -2175,6 +2180,7 @@ class EditorState extends State<Editor> {
     setState(() {
       final removedStrokes = page.strokes.toList();
       final removedImages = page.images.toList();
+      page.textBoxes.clear();
       page.strokes.clear();
       page.images.clear();
       removeExcessPages();

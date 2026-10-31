@@ -21,6 +21,7 @@ class Canvas extends StatelessWidget {
     required this.setAsBackground,
     required this.currentToolIsSelect,
     required this.currentScale,
+    this.onTextBoxChanged,
     this.placeholder = false,
   });
 
@@ -38,6 +39,7 @@ class Canvas extends StatelessWidget {
 
   final bool currentToolIsSelect;
   final double currentScale;
+  final VoidCallback? onTextBoxChanged;
   final bool placeholder;
 
   @override
@@ -75,6 +77,7 @@ class Canvas extends StatelessWidget {
                       setAsBackground: setAsBackground,
                       currentToolIsSelect: currentToolIsSelect,
                       currentScale: currentScale,
+                      onTextBoxChanged: onTextBoxChanged,
                     ),
                   ),
                 )

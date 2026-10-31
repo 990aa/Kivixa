@@ -10,6 +10,7 @@ import 'package:kivixa/components/canvas/_stroke.dart';
 import 'package:kivixa/components/canvas/image/editor_image.dart';
 import 'package:kivixa/components/canvas/inner_canvas.dart';
 import 'package:kivixa/components/canvas/pencil_shader.dart';
+import 'package:kivixa/data/editor/text_box.dart';
 import 'package:kivixa/data/tools/highlighter.dart';
 import 'package:kivixa/data/tools/laser_pointer.dart';
 
@@ -87,6 +88,7 @@ class EditorPage extends ChangeNotifier implements HasSize {
   final List<Stroke> strokes;
   final List<LaserStroke> laserStrokes;
   final List<EditorImage> images;
+  final List<EditorTextBox> textBoxes;
   final QuillStruct quill;
 
   EditorImage? backgroundImage;
@@ -94,6 +96,7 @@ class EditorPage extends ChangeNotifier implements HasSize {
   bool get isEmpty =>
       strokes.isEmpty &&
       images.isEmpty &&
+      textBoxes.isEmpty &&
       quill.controller.document.isEmpty() &&
       backgroundImage == null;
   bool get isNotEmpty => !isEmpty;
@@ -147,6 +150,7 @@ class EditorPage extends ChangeNotifier implements HasSize {
     PageOrientation? orientation,
     List<Stroke>? strokes,
     List<EditorImage>? images,
+    List<EditorTextBox>? textBoxes,
     QuillStruct? quill,
     this.backgroundImage,
   }) : assert(
@@ -171,6 +175,7 @@ class EditorPage extends ChangeNotifier implements HasSize {
        strokes = strokes ?? [],
        laserStrokes = [],
        images = images ?? [],
+       textBoxes = textBoxes ?? [],
        quill =
            quill ??
            QuillStruct(
@@ -210,6 +215,12 @@ class EditorPage extends ChangeNotifier implements HasSize {
         kvxPath: kvxPath,
         assetCache: assetCache,
       ),
+      textBoxes:
+          (json['t'] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .map(EditorTextBox.fromJson)
+              .toList() ??
+          [],
       quill: QuillStruct(
         controller: json['q'] != null
             ? QuillController(
@@ -240,6 +251,8 @@ class EditorPage extends ChangeNotifier implements HasSize {
       's': strokes.map((stroke) => stroke.toJson()).toList(),
     if (images.isNotEmpty)
       'i': images.map((image) => image.toJson(assets)).toList(),
+    if (textBoxes.isNotEmpty)
+      't': textBoxes.map((textBox) => textBox.toJson()).toList(),
     if (!quill.controller.document.isEmpty())
       'q': quill.controller.document.toDelta().toJson(),
     if (backgroundImage != null) 'b': backgroundImage?.toJson(assets),
@@ -357,6 +370,7 @@ class EditorPage extends ChangeNotifier implements HasSize {
     PageOrientation? orientation,
     List<Stroke>? strokes,
     List<EditorImage>? images,
+    List<EditorTextBox>? textBoxes,
     QuillStruct? quill,
     EditorImage? backgroundImage,
   }) => EditorPage(
@@ -364,6 +378,7 @@ class EditorPage extends ChangeNotifier implements HasSize {
     orientation: orientation ?? this.orientation,
     strokes: strokes ?? this.strokes,
     images: images ?? this.images,
+    textBoxes: textBoxes ?? this.textBoxes,
     quill: quill ?? this.quill,
     backgroundImage: backgroundImage ?? this.backgroundImage,
   );

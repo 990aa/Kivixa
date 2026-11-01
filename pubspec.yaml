@@ -46,7 +46,7 @@ dependencies:
   saver_gallery: ^5.1.0
   animations: ^3.0.0
   flutter_quill: ^11.1.0
-  window_manager: ^0.5.1
+  window_manager: ^0.6.0
   worker_manager: ^7.0.1
   workmanager: ^0.10.10
   archive: ^4.0.3
@@ -73,14 +73,14 @@ dependencies:
   path: ^1.9.1
   stow: ^0.6.0
   stow_plain: ^0.6.0
-  stow_secure: ^0.6.0
+  stow_secure: ^0.7.0
   stow_codecs: ^1.4.0
   background_downloader: ^9.2.6
   markdown: ^7.2.2
   flutter_math_fork: ^0.7.2
   appflowy_editor: ^6.1.0
   flutter_local_notifications: ^19.5.0
-  timezone: ^0.10.1
+  timezone: ^0.11.0
   syncfusion_flutter_calendar: ^32.1.19
   flutter_markdown_plus: ^1.0.5
   flutter_smooth_markdown: ^0.10.0

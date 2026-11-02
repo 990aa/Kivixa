@@ -17,12 +17,10 @@ list(APPEND FLUTTER_PLUGIN_LIST
   permission_handler_windows
   printing
   record_windows
-  screen_retriever_windows
   share_plus
   speech_to_text_windows
   super_native_extensions
   url_launcher_windows
-  window_manager
   window_to_front
 )
 

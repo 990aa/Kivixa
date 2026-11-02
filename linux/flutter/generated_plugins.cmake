@@ -14,10 +14,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   printing
   record_linux
   rust_lib_kivixa
-  screen_retriever_linux
   super_native_extensions
   url_launcher_linux
-  window_manager
   window_to_front
 )
 

@@ -46,7 +46,7 @@ dependencies:
   saver_gallery: ^5.1.0
   animations: ^3.0.0
   flutter_quill: ^11.1.0
-  window_manager: ^0.5.1
+  window_manager: ^0.6.0
   worker_manager: ^7.0.1
   workmanager: ^0.10.10
   archive: ^4.0.3

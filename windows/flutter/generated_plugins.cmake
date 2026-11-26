@@ -12,15 +12,15 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_tts
   irondash_engine_context
   media_kit_libs_windows_video
-  media_kit_video
   objectbox_flutter_libs
   permission_handler_windows
   printing
   record_windows
-  share_plus
   speech_to_text_windows
   super_native_extensions
   url_launcher_windows
+  share_plus
+  media_kit_video
   window_to_front
 )
 

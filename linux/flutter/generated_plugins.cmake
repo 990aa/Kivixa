@@ -8,7 +8,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_secure_storage_linux
   irondash_engine_context
   media_kit_libs_linux
-  media_kit_video
   objectbox_flutter_libs
   open_file_linux
   printing
@@ -16,6 +15,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   rust_lib_kivixa
   super_native_extensions
   url_launcher_linux
+  media_kit_video
   window_to_front
 )
 
